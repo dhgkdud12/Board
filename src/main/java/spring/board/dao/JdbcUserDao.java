@@ -4,10 +4,14 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import spring.board.dto.LoginDto;
 import spring.board.dto.UserDto;
 import spring.board.entity.User;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 
 @Repository
 public class JdbcUserDao {
