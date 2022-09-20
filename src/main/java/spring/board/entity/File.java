@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileEntity {
+public class File {
 
     // 파일 번호
     private Integer fileNo;
