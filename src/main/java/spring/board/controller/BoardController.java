@@ -1,5 +1,6 @@
 package spring.board.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import spring.board.dto.BoardDto;
 import spring.board.dto.CommentDto;
@@ -11,6 +12,8 @@ import spring.board.service.CommentService;
 import spring.board.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -39,8 +42,8 @@ public class BoardController {
 
     // 게시물 작성
     // 파일 처리
-    @PostMapping("")
-    public String post(@RequestBody BoardDto boardDto, HttpServletRequest request) {
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String post(BoardDto boardDto, HttpServletRequest request) throws IOException, ParseException {
         return boardService.post(boardDto, request);
     }
 
@@ -70,12 +73,12 @@ public class BoardController {
     }
 
     @GetMapping("/{bIdx}/comment/{cIdx}")
-    public List<Comment> selectComment(@PathVariable("bIdx") Integer bIdx, @PathVariable("cIdx") Integer cIdx) {
+    public List<Comment> selectComment(@PathVariable("bIdx") Integer bIdx) {
         return commentService.selectCommentsByPostId(bIdx);
     }
 
     @DeleteMapping("/{bIdx}/comment/{cIdx}")
     public String deleteComment(@PathVariable("bIdx") Integer bIdx, @PathVariable("cIdx") Integer cIdx, HttpServletRequest request) {
-        return commentService.delete(bIdx, request);
+        return commentService.delete(cIdx, request);
     }
 }
