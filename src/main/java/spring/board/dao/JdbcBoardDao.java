@@ -76,6 +76,7 @@ public class JdbcBoardDao {
         jdbcTemplate.update(query, boardDto.getTitle(), boardDto.getContent(), boardDto.getUpdateTime(), boardDto.getBoardNo());
     }
 
+    // 게시물 삭제
     public void deletePost(Integer bIdx){
         String query = "DELETE FROM board WHERE board_no = ?" ;
         jdbcTemplate.update(query, bIdx);
