@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserSessionDto {
-    private Integer idx;
-    private String name;
+public class FileResponse {
+    private Integer fileNo;
+    private String fileName;
+    private String path;
 }

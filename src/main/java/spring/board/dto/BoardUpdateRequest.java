@@ -5,11 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginDto {
-    private String id;
-    private String password;
+public class BoardUpdateRequest {
+    private Integer boardNo;
+    private String title;
+    private String content;
+    private Timestamp updateTime;
 }
+

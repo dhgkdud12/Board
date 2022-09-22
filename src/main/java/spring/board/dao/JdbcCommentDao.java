@@ -4,6 +4,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import spring.board.dto.CommentResponse;
 import spring.board.entity.Comment;
 
 import java.sql.ResultSet;
@@ -25,8 +26,8 @@ public class JdbcCommentDao {
     }
 
     // 게시물별 댓글 가져오기
-    public List<Comment> selectCommentsByPostId(Integer bIdx) {
-        String query = "SELECT * FROM comment where board_no = ?";
+    public List<CommentResponse> selectCommentsByPostId(Integer bIdx) {
+        String query = "select c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date from comment c inner join user u on c.user_idx = u.idx where c.board_no = ? order by comment_no;";
         try {
             return jdbcTemplate.query(query, new JdbcCommentDao.CommentRowMapper(), bIdx);
         } catch (EmptyResultDataAccessException e) {
@@ -34,8 +35,9 @@ public class JdbcCommentDao {
         }
     }
 
-    public Comment selectCommentByCommentId(Integer id) {
-        String query = "SELECT * FROM comment WHERE comment_no = ?";
+    // 게시물별 댓글 인덱스 새로
+    public CommentResponse selectCommentByCommentId(Integer id) {
+        String query = "SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date FROM comment c INNER JOIN user u on c.user_idx = u.idx WHERE comment_no = ?";
         try {
             return jdbcTemplate.queryForObject(query, new JdbcCommentDao.CommentRowMapper(), id);
         } catch (EmptyResultDataAccessException e) {
@@ -43,8 +45,9 @@ public class JdbcCommentDao {
         }
     }
 
-    public Comment selectCommentByUserId(Integer id, Integer uIdx) {
-        String query = "SELECT * FROM comment WHERE user_idx = ? AND comment_no = ?";
+    // x
+    public CommentResponse selectCommentByUserId(Integer id, Integer uIdx) {
+        String query = "SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date FROM comment c INNER JOIN user u on c.user_idx = u.idx WHERE user_idx = ? AND comment_no = ?";
         try {
             return jdbcTemplate.queryForObject(query, new JdbcCommentDao.CommentRowMapper(), id, uIdx);
         } catch (EmptyResultDataAccessException e) {
@@ -57,19 +60,20 @@ public class JdbcCommentDao {
         jdbcTemplate.update(query, cIdx);
     }
 
-    public List<Comment> selectCommentsByUserId(Integer uIdx) {
-        String query = "SELECT * FROM comment WHERE user_idx = ?";
+    public List<CommentResponse> selectCommentsByUserId(Integer uIdx) {
+        String query = "select c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date from comment c inner join user u on c.user_idx = u.idx where c.user_idx = ? order by comment_no;";
         return jdbcTemplate.query(query, new JdbcCommentDao.CommentRowMapper(), uIdx);
     }
 
-    public class CommentRowMapper implements RowMapper<Comment> {
+    public class CommentRowMapper implements RowMapper<CommentResponse> {
         @Override
-        public Comment mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new Comment(
+        public CommentResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return new CommentResponse(
                     rs.getInt("comment_no"),
                     rs.getInt("board_no"),
                     rs.getString("content"),
                     rs.getInt("user_idx"),
+                    rs.getString("name"),
                     rs.getTimestamp("date")
             );
         }

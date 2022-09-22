@@ -2,8 +2,9 @@ package spring.board.service;
 
 import org.springframework.stereotype.Service;
 import spring.board.dao.JdbcCommentDao;
-import spring.board.dto.CommentDto;
-import spring.board.dto.UserSessionDto;
+import spring.board.dto.CommentRequest;
+import spring.board.dto.CommentResponse;
+import spring.board.dto.UserSession;
 import spring.board.entity.Comment;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,51 +25,52 @@ public class CommentService {
         this.commentDao = commentDao;
     }
 
-    public List<Comment> selectCommentsByPostId(Integer bIdx) {
+    public List<CommentResponse> selectCommentsByPostId(Integer bIdx) {
         return commentDao.selectCommentsByPostId(bIdx);
     }
 
-    public String post(Integer bIdx, CommentDto commentDto, HttpServletRequest request) {
+    public String post(Integer bIdx, CommentRequest commentRequest, HttpServletRequest request) {
         HttpSession session = request.getSession();
-        UserSessionDto userSessionDto = (UserSessionDto) session.getAttribute("USER");
+        UserSession userSession = (UserSession) session.getAttribute("USER");
 
-        if (userSessionDto != null && boardService.selectPostByPostId(bIdx) != null) {
-            Comment comment = new Comment(null,bIdx,commentDto.getContent(), userSessionDto.getIdx(),new Timestamp(new Date().getTime()));
-            System.out.println(comment);
+        if (boardService.selectPostByPostId(bIdx) == null) System.out.println("게시물이 존재하지 않음");
+        else if (userSession != null) {
+            Comment comment = new Comment(null,bIdx, commentRequest.getContent(), userSession.getIdx(),new Timestamp(new Date().getTime()));
             commentDao.insertComment(comment);
             return "댓글 작성 완료";
         } else {
             System.out.println("로그인을 먼저 해주세요.");
-            return null;
         }
+        return "댓글 작성 실패";
     }
 
-    public String delete(Integer cIdx, HttpServletRequest request) {
-        UserSessionDto userSessionDto = userService.getLoginUserInfo(request);
+    public String delete(Integer cIdx, HttpServletRequest request) { // 글이 존재하지 않을 경우
+        UserSession userSession = userService.getLoginUserInfo(request);
         Integer c_uidx = commentDao.selectCommentByCommentId(cIdx).getUserIdx();
 
-        if (userSessionDto != null ) {
-            if (c_uidx.equals(userSessionDto.getIdx())) {
+        if (c_uidx == null) System.out.println("게시물이 존재하지 않음");
+        else if (userSession != null ) {
+            if (c_uidx.equals(userSession.getIdx())) {
                 commentDao.deleteComment(cIdx);
                 return "댓글 삭제 완료";
             } else {
                 System.out.println("본인 댓글만 삭제 가능");
             }
         } else {
-            System.out.println("사용자 로그인 정보 없음");
+            System.out.println("로그인 후 댓글 작성 가능");
         }
         return "댓글 삭제 실패";
     }
 
-    public List<Comment> selectCommentsByUserId(HttpServletRequest request) {
+    public List<CommentResponse> selectCommentsByUserId(HttpServletRequest request) {
         HttpSession session = request.getSession();
-        UserSessionDto userSessionDto = (UserSessionDto) session.getAttribute("USER");
-        return commentDao.selectCommentsByUserId(userSessionDto.getIdx());
+        UserSession userSession = (UserSession) session.getAttribute("USER");
+        return commentDao.selectCommentsByUserId(userSession.getIdx());
     }
 
-    public Comment selectCommentByUserId(HttpServletRequest request, Integer cIdx) {
+    public CommentResponse selectCommentByUserId(HttpServletRequest request, Integer cIdx) {
         HttpSession session = request.getSession();
-        UserSessionDto userSessionDto = (UserSessionDto) session.getAttribute("USER");
-        return commentDao.selectCommentByUserId(userSessionDto.getIdx(), cIdx);
+        UserSession userSession = (UserSession) session.getAttribute("USER");
+        return commentDao.selectCommentByUserId(userSession.getIdx(), cIdx);
     }
 }

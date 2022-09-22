@@ -1,12 +1,9 @@
 package spring.board.controller;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import spring.board.dto.BoardDto;
-import spring.board.dto.CommentDto;
-import spring.board.dto.UserSessionDto;
-import spring.board.entity.Board;
-import spring.board.entity.Comment;
+import spring.board.dto.*;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 import spring.board.service.UserService;
@@ -31,32 +28,32 @@ public class BoardController {
 
     // 홈화면
     @GetMapping("")
-    public List<Board> home(HttpServletRequest request) {
-        UserSessionDto userSessionDto = userService.getLoginUserInfo(request);
-        if (userSessionDto != null) {
-            System.out.println(userSessionDto.getName()+"님 로그인중");
+    public List<BoardResponse> home(@Param("page") int page, HttpServletRequest request) {
+        UserSession userSession = userService.getLoginUserInfo(request);
+        if (userSession != null) {
+            System.out.println(userSession.getName()+"님 로그인중");
         }
-        return boardService.selectAllPosts();
+        return boardService.selectAllPosts(page);
     }
 
 
     // 게시물 작성
     // 파일 처리
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String post(BoardDto boardDto, HttpServletRequest request) throws IOException, ParseException {
-        return boardService.post(boardDto, request);
+    public String post(BoardRequest boardRequest, HttpServletRequest request) throws IOException, ParseException {
+        return boardService.post(boardRequest, request);
     }
 
     @GetMapping("/{bIdx}")
-    public Board selectPost(@PathVariable("bIdx") Integer bIdx) {
-        return boardService.selectPostByPostId(bIdx);
+    public BoardInfoResponse selectPost(@PathVariable("bIdx") Integer bIdx) {
+        return boardService.selectPostsByPostId(bIdx);
     }
     
     // 게시물 수정
     // 내가 작성한 게시물만 수정 가능
     @PutMapping("/{bIdx}")
-    public String updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardDto boardDto, HttpServletRequest request) {
-        return boardService.updatePost(bIdx, boardDto, request);
+    public String updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardRequest boardRequest, HttpServletRequest request) {
+        return boardService.updatePost(bIdx, boardRequest, request);
     }
     
     // 게시물 삭제
@@ -68,12 +65,12 @@ public class BoardController {
 
     // 댓글 작성
     @PostMapping("/{bIdx}")
-    public String postComment(@PathVariable("bIdx") Integer bIdx, @RequestBody CommentDto commentDto, HttpServletRequest request) {
-        return commentService.post(bIdx, commentDto, request);
+    public String postComment(@PathVariable("bIdx") Integer bIdx, @RequestBody CommentRequest commentRequest, HttpServletRequest request) {
+        return commentService.post(bIdx, commentRequest, request);
     }
 
     @GetMapping("/{bIdx}/comment/{cIdx}")
-    public List<Comment> selectComment(@PathVariable("bIdx") Integer bIdx) {
+    public List<CommentResponse> selectComment(@PathVariable("bIdx") Integer bIdx) {
         return commentService.selectCommentsByPostId(bIdx);
     }
 

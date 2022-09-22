@@ -3,8 +3,8 @@ package spring.board.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import spring.board.entity.Board;
-import spring.board.entity.Comment;
+import spring.board.dto.BoardResponse;
+import spring.board.dto.CommentResponse;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 
@@ -26,13 +26,13 @@ public class MyController {
 
     // 내가 작성한 글
     @GetMapping("/board")
-    public List<Board> myBoards(HttpServletRequest request) {
+    public List<BoardResponse> myBoards(HttpServletRequest request) {
         return boardService.selectPostByUserId(request);
     }
     
     // 내가 작성한 댓글
     @GetMapping("/comment")
-    public List<Comment> myComments(HttpServletRequest request) {
+    public List<CommentResponse> myComments(HttpServletRequest request) {
         return commentService.selectCommentsByUserId(request);
     }
 

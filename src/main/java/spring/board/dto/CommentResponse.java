@@ -5,12 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentDto {
+public class CommentResponse {
+    private Integer commentNo;
+    private Integer boardNo;
     private String content;
+    private Integer userIdx;
+    private String userName;
+    private Timestamp date;
 }
 

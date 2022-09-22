@@ -3,9 +3,9 @@ package spring.board.service;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import spring.board.dao.JdbcUserDao;
-import spring.board.dto.LoginDto;
-import spring.board.dto.UserDto;
-import spring.board.dto.UserSessionDto;
+import spring.board.dto.UserLoginRequest;
+import spring.board.dto.UserRequest;
+import spring.board.dto.UserSession;
 import spring.board.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,25 +19,25 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public String register(UserDto userDto) {
-        String hashPassword = BCrypt.hashpw(userDto.getPassword(), BCrypt.gensalt());
-        userDto.setPassword(hashPassword);
-        userDao.insertUser(userDto);
+    public String register(UserRequest userRequest) {
+        String hashPassword = BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt());
+        userRequest.setPassword(hashPassword);
+        userDao.insertUser(userRequest);
         return "회원가입 완료";
     }
 
-    public String login(LoginDto loginDto, HttpServletRequest request) {
+    public String login(UserLoginRequest userLoginRequest, HttpServletRequest request) {
 
         if (request.getSession().getAttribute("USER") != null) {
             return "이미 로그인중";
         }
 
         // 아이디 확인
-        User loginUser = userDao.selectUser(loginDto.getId());
+        User loginUser = userDao.selectUser(userLoginRequest.getId());
         if (loginUser == null) {
             System.out.println("사용자 id 없음");
         } else {
-            if (BCrypt.checkpw(loginDto.getPassword(), loginUser.getPassword())){
+            if (BCrypt.checkpw(userLoginRequest.getPassword(), loginUser.getPassword())){
                 if (createUserSession(loginUser, request) == null) {
                     System.out.println("유저 세션 생성 실패");
                 }
@@ -49,19 +49,19 @@ public class UserService {
         return "로그인 실패";
     }
 
-    public UserSessionDto createUserSession(User loginUser, HttpServletRequest request) {
-        UserSessionDto userSessionDto = new UserSessionDto(loginUser.getIdx(), loginUser.getName());
+    public UserSession createUserSession(User loginUser, HttpServletRequest request) {
+        UserSession userSession = new UserSession(loginUser.getIdx(), loginUser.getName());
 
         HttpSession httpSession = request.getSession();
-        httpSession.setAttribute("USER", userSessionDto);
+        httpSession.setAttribute("USER", userSession);
 
-        return userSessionDto;
+        return userSession;
     }
 
     // 로그인 확인
-    public UserSessionDto getLoginUserInfo(HttpServletRequest request) {
+    public UserSession getLoginUserInfo(HttpServletRequest request) {
         HttpSession session = request.getSession();
-        return (UserSessionDto) session.getAttribute("USER");
+        return (UserSession) session.getAttribute("USER");
     }
 
     public String logout(HttpServletRequest request) {

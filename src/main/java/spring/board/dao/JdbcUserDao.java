@@ -4,7 +4,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import spring.board.dto.UserDto;
+import spring.board.dto.UserRequest;
 import spring.board.entity.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,9 +18,9 @@ public class JdbcUserDao {
     }
 
     // 사용자 등록
-    public void insertUser(UserDto userDto){
+    public void insertUser(UserRequest userRequest){
         String query = "INSERT INTO user (name, id, password, email) values (?, ?, ?, ?)" ;
-        jdbcTemplate.update(query, userDto.getName(), userDto.getId(), userDto.getPassword(), userDto.getEmail());
+        jdbcTemplate.update(query, userRequest.getName(), userRequest.getId(), userRequest.getPassword(), userRequest.getEmail());
     }
 
     // 사용자 정보 가져오기

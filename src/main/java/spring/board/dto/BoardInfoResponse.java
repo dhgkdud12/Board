@@ -1,19 +1,18 @@
 package spring.board.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
-    private Integer idx;
-    private String id;
-    private String name;
-    private String password;
-    private String email;
+public class BoardInfoResponse {
+    private BoardResponse boardResponse;
+    private FileResponse fileResponse;
+    private List<CommentResponse> commentResponses;
 }
+

@@ -1,8 +1,8 @@
 package spring.board.controller;
 
 import org.springframework.web.bind.annotation.*;
-import spring.board.dto.LoginDto;
-import spring.board.dto.UserDto;
+import spring.board.dto.UserLoginRequest;
+import spring.board.dto.UserRequest;
 import spring.board.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,14 +18,14 @@ public class UserController {
 
     // 회원가입
     @PostMapping("")
-    public String register(@RequestBody UserDto userDto) {
-        return userService.register(userDto);
+    public String register(@RequestBody UserRequest userRequest) {
+        return userService.register(userRequest);
     }
 
     // 로그인
     @PostMapping ("/login")
-    public String logIn(@RequestBody LoginDto loginDto, HttpServletRequest request) {
-        return userService.login(loginDto, request);
+    public String logIn(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+        return userService.login(userLoginRequest, request);
     }
     
     // 로그아웃
