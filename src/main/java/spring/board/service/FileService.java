@@ -1,5 +1,7 @@
 package spring.board.service;
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -14,6 +16,7 @@ import spring.board.entity.FileEntity;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,6 +59,63 @@ public class FileService {
 
         FileEntity file = new FileEntity(null, bIdx, onlyFName, convertName, fullPath, fileE);
         if (fileDao.insertFile(file) == 1) return "파일 업로드 완료";
+        else return "파일 업로드 실패";
+
+
+    }
+
+    public String uploadFiletoFtp(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
+
+
+        // 원본 파일명, 확장자
+        String fileName = boardRequest.getFile().getOriginalFilename();
+        int idx = fileName.indexOf(".");
+        String onlyFName = fileName.substring(0, idx);
+        String fileE = fileName.substring(idx+1);
+
+        // 파일명 변환
+        LocalDateTime now = LocalDateTime.now();
+        String formattedNow = now.format(DateTimeFormatter.ofPattern("yyyymmddhhmmss"));
+        String convertName = onlyFName+formattedNow;
+
+        // 파일 경로 및 저장
+        String filePath = "/file/";
+        String fullPath = filePath+convertName+"."+fileE;
+
+        File file = new File(boardRequest.getFile().); // 원본 파일 경로
+        boardRequest.getFile().transferTo(new File(fullPath));
+//        System.out.println(file);
+        FileInputStream fileInputStream = null;
+
+        FTPClient ftpClient = new FTPClient();
+        try {
+            ftpClient.connect("211.62.140.77",21);
+            ftpClient.login("administrator","ulalalab12!@");
+            ftpClient.enterLocalActiveMode();
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+            fileInputStream = new FileInputStream(file);
+
+            ftpClient.storeFile(fullPath, fileInputStream);
+        } catch (Exception e) {
+
+        } finally {
+            if (fileInputStream != null) {
+                fileInputStream.close();
+            }
+        }
+
+        ftpClient.disconnect();
+
+
+        Integer bIdx = boardRequest.getId();
+        System.out.println(onlyFName);
+        System.out.println(convertName);
+        System.out.println(fileE);
+        System.out.println(fullPath);
+
+        FileEntity fileEntity = new FileEntity(null, bIdx, onlyFName, convertName, fullPath, fileE);
+        if (fileDao.insertFile(fileEntity) == 1) return "파일 업로드 완료";
         else return "파일 업로드 실패";
 
 
