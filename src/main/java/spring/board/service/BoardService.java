@@ -18,16 +18,12 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class BoardService {
     private final UserService userService;
     private final FileService fileService;
-    @Autowired
-    private JdbcBoardDao boardDao;
-
-
-
-    private JdbcFileDao fileDao;
+    private final JdbcBoardDao boardDao;
+    private final JdbcFileDao fileDao;
     private final JdbcCommentDao commentDao;
 
 
