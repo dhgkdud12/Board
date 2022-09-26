@@ -1,5 +1,7 @@
 package spring.board.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spring.board.dao.JdbcBoardDao;
 import spring.board.dao.JdbcCommentDao;
@@ -16,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+//@RequiredArgsConstructor
 public class BoardService {
     private final UserService userService;
     private final FileService fileService;
@@ -32,6 +35,8 @@ public class BoardService {
         this.commentDao = commentDao;
     }
 
+
+
     public String post(BoardRequest boardRequest, HttpServletRequest request) throws ParseException, IOException {
         HttpSession session = request.getSession();
         UserSession userSession = (UserSession) session.getAttribute("USER");
@@ -41,7 +46,7 @@ public class BoardService {
             int bIdx = boardDao.insertPost(board);
             if (boardRequest.getFile() != null) {
                 boardRequest.setId(bIdx);
-                return fileService.uploadFile(boardRequest, request);
+                return fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
             }
         } else {
             System.out.println("로그인을 먼저 해주세요.");

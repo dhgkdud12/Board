@@ -20,7 +20,7 @@ public class FileController {
 
     @GetMapping("/download/{fIdx}")
     public ResponseEntity<Object> download(@PathVariable("fIdx") Integer fIdx) throws IOException {
-        return fileService.downloadFile(fIdx);
+        return fileService.downloadFilefromFTP(fIdx);
     }
 
 }
