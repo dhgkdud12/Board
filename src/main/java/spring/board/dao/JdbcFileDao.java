@@ -20,8 +20,8 @@ public class JdbcFileDao {
 
     // 파일 등록
     public int insertFile(FileEntity file){
-        String query = "INSERT INTO file (board_no, file_name, convert_name, path, extension) values (?, ?, ?, ?, ?)" ;
-        return jdbcTemplate.update(query, file.getBoardNo(), file.getFileName(), file.getConvertName(), file.getPath(), file.getExtention());
+        String query = "INSERT INTO file (board_no, file_name, convert_name, path, extension, size) values (?, ?, ?, ?, ?, ?)" ;
+        return jdbcTemplate.update(query, file.getBoardNo(), file.getFileName(), file.getConvertName(), file.getPath(), file.getExtension(), file.getSize());
     }
 
     // 파일 가져오기
@@ -54,7 +54,8 @@ public class JdbcFileDao {
                     rs.getString("file_name"),
                     rs.getString("convert_name"),
                     rs.getString("path"),
-                    rs.getString("extension")
+                    rs.getString("extension"),
+                    rs.getLong("size")
                     );
         }
     }

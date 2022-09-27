@@ -27,6 +27,9 @@ public class FileEntity {
     private String path;
 
     // 파일 확장자
-    private String extention;
+    private String extension;
+
+    //파일 크기
+    private Long size;
 
 }
