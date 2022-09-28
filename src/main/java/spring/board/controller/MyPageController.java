@@ -13,25 +13,25 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/myPage")
-public class MyController {
+public class MyPageController {
 
     private final BoardService boardService;
     private final CommentService commentService;
 
 
-    public MyController(BoardService boardService, CommentService commentService) {
+    public MyPageController(BoardService boardService, CommentService commentService) {
         this.boardService = boardService;
         this.commentService = commentService;
     }
 
     // 내가 작성한 글
-    @GetMapping("/board")
+    @GetMapping("/boards")
     public List<BoardResponse> myBoards(HttpServletRequest request) {
         return boardService.selectPostByUserId(request);
     }
     
     // 내가 작성한 댓글
-    @GetMapping("/comment")
+    @GetMapping("/comments")
     public List<CommentResponse> myComments(HttpServletRequest request) {
         return commentService.selectCommentsByUserId(request);
     }

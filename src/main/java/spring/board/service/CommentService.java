@@ -35,6 +35,12 @@ public class CommentService {
 
         if (boardService.selectPostByPostId(bIdx) == null) System.out.println("게시물이 존재하지 않음");
         else if (userSession != null) {
+
+            // 부모 id가 없으면 댓글
+            // parentCIdx는 null, groupNo 자동증가, layer 0, child 0, 0
+            // 부모 id가 있으면 대댓글
+            // parentCIdx, groupNo 그대로, layer 가져와서 +1,  자식 댓글 수 0, 부모의 자식 댓글 수 +1, 부모의 groupOrder+1
+
             Comment comment = new Comment(null,bIdx, commentRequest.getContent(), userSession.getIdx(),new Timestamp(new Date().getTime()));
             commentDao.insertComment(comment);
             return "댓글 작성 완료";
