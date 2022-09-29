@@ -1,7 +1,5 @@
 package spring.board.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spring.board.dao.JdbcBoardDao;
 import spring.board.dao.JdbcCommentDao;
@@ -13,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +34,7 @@ public class BoardService {
 
 
 
-    public String post(BoardRequest boardRequest, HttpServletRequest request) throws ParseException, IOException {
+    public String post(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
         HttpSession session = request.getSession();
         UserSession userSession = (UserSession) session.getAttribute("USER");
 
@@ -55,7 +52,10 @@ public class BoardService {
     }
 
     public List<BoardResponse> selectAllPosts(int page) {
+        // 총 개수 가져와서 페이지정보 설정 - page 1일 때만 가져옴
+        // start, end index 계산해서 db에 넘겨줌
         return boardDao.selectPost(page);
+        // ROWNUM 적용하고 stIdx, edIdx 받아서 게시물 출력
     }
 
     public BoardResponse selectPostByPostId(Integer bIdx) {
@@ -76,7 +76,11 @@ public class BoardService {
         return null;
     }
 
+    // 내 게시물 - 사용자 검색
     public List<BoardResponse> selectPostByUserId(HttpServletRequest request) {
+        // 총 개수 가져와서 페이지정보 설정
+        // 인덱스 1부터 10개만 출력
+        // db에 startIndex 넘겨줌
         HttpSession session = request.getSession();
         UserSession userSession = (UserSession) session.getAttribute("USER");
 
@@ -123,4 +127,12 @@ public class BoardService {
         }
         return "게시물 삭제 실패";
     }
+
+    public BoardResponse searchPosts(String q) {
+        return boardDao.searchPosts(q);
+    }
+
+    // 제목 검색 like 0%0
+    // 내용 검색
+    // 작성자 검색
 }

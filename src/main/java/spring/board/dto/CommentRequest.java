@@ -11,6 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentRequest {
+    // 부모 댓글 id
+    private Integer parentId;
     private String content;
 }
 
