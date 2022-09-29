@@ -19,5 +19,12 @@ public class CommentResponse {
     private Integer userIdx;
     private String userName;
     private Timestamp date;
+
+    private Integer parentId;
+    private Integer groupNo;
+    private Integer layer;
+    private Integer childCnt;
+    private Integer groupOrd;
+
 }
 

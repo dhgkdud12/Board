@@ -35,7 +35,14 @@ public class CommentService {
 
         if (boardService.selectPostByPostId(bIdx) == null) System.out.println("게시물이 존재하지 않음");
         else if (userSession != null) {
-            Comment comment = new Comment(null,bIdx, commentRequest.getContent(), userSession.getIdx(),new Timestamp(new Date().getTime()));
+            // 부모 댓글 없을 경우
+            Comment comment = null;
+            if (commentRequest.getParentId() == null) {
+                comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), null, null, 0, 0, 0);
+            } else {
+                comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), commentRequest.getParentId(), null, 0, 0, 0);
+            }
+
             commentDao.insertComment(comment);
             return "댓글 작성 완료";
         } else {

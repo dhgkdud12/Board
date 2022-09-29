@@ -4,7 +4,6 @@ import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -53,13 +52,16 @@ public class FileService {
         String fullPath = filePath+convertName+"."+fileE;
         boardRequest.getFile().transferTo(new File(fullPath));
 
+        // 파일 사이즈
+        long fileSize = boardRequest.getFile().getSize();
+
         Integer bIdx = boardRequest.getId();
         System.out.println(onlyFName);
         System.out.println(convertName);
         System.out.println(fileE);
         System.out.println(fullPath);
 
-        FileEntity file = new FileEntity(null, bIdx, onlyFName, convertName, filePath, fileE);
+        FileEntity file = new FileEntity(null, bIdx, onlyFName, convertName, filePath, fileE, fileSize);
         if (fileDao.insertFile(file) == 1) return "파일 업로드 완료";
         else return "파일 업로드 실패";
 
@@ -79,9 +81,12 @@ public class FileService {
         String formattedNow = now.format(DateTimeFormatter.ofPattern("yyyyMMddhhmmss"));
         String convertName = onlyFName+formattedNow;
 
-        // 파일 경로 및 저장
+        // 파일 경로
         String filePath = "/file/";
         String fullPath = filePath+convertName+"."+fileE;
+
+        // 파일 크기
+        long fileSize = boardRequest.getFile().getSize();
 
         FTPClient ftpClient = new FTPClient();
         try {
@@ -101,7 +106,6 @@ public class FileService {
                 ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
                 boolean isSuccess = ftpClient.storeFile(fullPath, boardRequest.getFile().getInputStream()); // 파일 저장
-                System.out.println("fullPath: " + fullPath);
                 if (isSuccess) {
                     System.out.println("업로드 성공");
                 }
@@ -125,9 +129,10 @@ public class FileService {
         System.out.println(onlyFName);
         System.out.println(convertName);
         System.out.println(fileE);
-        System.out.println(fullPath);
+        System.out.println(filePath);
+        System.out.println(fileSize);
 
-        FileEntity fileEntity = new FileEntity(null, bIdx, onlyFName, convertName, filePath, fileE);
+        FileEntity fileEntity = new FileEntity(null, bIdx, onlyFName, convertName, filePath, fileE, fileSize);
         if (fileDao.insertFile(fileEntity) == 1) return "파일 업로드 완료";
         else return "파일 업로드 실패";
 
@@ -143,11 +148,13 @@ public class FileService {
         }
     }
 
-    public ResponseEntity<Object> downloadFilefromFTP(Integer fIdx) throws IOException {
-        FileRequest g_file = fileDao.selectFile(fIdx);
+    public ResponseEntity<Object> downloadFilefromFTP(Integer fIdx) {
 
-        String f_path = g_file.getPath(); // 파일 경로 얻기
-        System.out.println("path: "+f_path);
+        HttpHeaders headers = new HttpHeaders();
+        Resource resource = null;
+
+        FileRequest g_file = fileDao.selectFile(fIdx);
+        String path = g_file.getPath(); // 파일 경로 얻기
 
         FTPClient ftpClient = new FTPClient();
         try {
@@ -161,64 +168,40 @@ public class FileService {
                 System.out.println("연결 비정상");
             } else {
                 ftpClient.login("administrator","ulalalab12!@");
-                showServerReply(ftpClient);
-
                 ftpClient.enterLocalPassiveMode(); // passive 모드
                 ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+                ftpClient.changeWorkingDirectory(path); // 디렉토리 이동
 
-                System.out.println("remote address: " + ftpClient.getLocalAddress());
+                String name = "temp"+"."+g_file.getExtension();
+                File f = new File(name);
+                f.createNewFile();
 
-                ftpClient.changeWorkingDirectory(f_path);
-
-                String name = "output";
                 OutputStream outputStream = new FileOutputStream(name);
 
-                if (ftpClient.retrieveFile(g_file.getConvertName()+"."+g_file.getExtention(), outputStream))
+                if (ftpClient.retrieveFile(g_file.getConvertName()+"."+g_file.getExtension(), outputStream)) // 파일 저장
                     System.out.println("success");
 
-                Path path = Paths.get(g_file.getConvertName()+"."+g_file.getExtention());
-                long bytes = Files.size(path);
+                InputStream inputStream = new FileInputStream(name);
 
-                System.out.print("os: ");
-//                outputStream.flush();
+                resource = new InputStreamResource(inputStream); // 파일 resource 얻기
 
-//                String path = ftpClient.printWorkingDirectory()+"/"+g_file.getConvertName()+"."+g_file.getExtention();
-//                System.out.println(path);
-
-                InputStream inputStream = new FileInputStream("output");
-
-
-                byte[] buffer = new byte[1024];
-
-                while (true) {
-                    int count = inputStream.read(buffer);
-                    if (count == -1) {
-                        System.out.println("더이상 읽을 데이터가 없음");
-                        break;
-                    }
-                }
-                inputStream.close();
-
-                Resource resource = new InputStreamResource(inputStream); // 파일 resource 얻기
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentDisposition(ContentDisposition.builder("attachment").filename(g_file.getFileName()+"."+g_file.getExtention()).build());  // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
+                headers.setContentDisposition(ContentDisposition.builder("attachment").filename(g_file.getFileName()+"."+g_file.getExtension()).build());
                 System.out.println("파일 다운로드 성공");
                 ftpClient.disconnect(); // 연결 해제
-                return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+
+                f.delete();
             }
 
         } catch(Exception e) {
             System.out.println("파일 다운로드 실패");
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
         }
-        return null;
+        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
     }
 
-    public ResponseEntity<Object> downloadFile(Integer fIdx) throws IOException {
+    public ResponseEntity<Object> downloadFile(Integer fIdx) {
         FileRequest g_file = fileDao.selectFile(fIdx);
 
-        String path = g_file.getPath()+g_file.getConvertName()+"."+g_file.getExtention(); // 파일 경로 얻기
+        String path = g_file.getPath()+g_file.getConvertName()+"."+g_file.getExtension(); // 파일 경로 얻기
 
         try {
             Path filePath = Paths.get(path);
@@ -226,7 +209,7 @@ public class FileService {
             Resource resource = new InputStreamResource(Files.newInputStream(filePath)); // 파일 resource 얻기
 
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(g_file.getFileName()+"."+g_file.getExtention()).build());  // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(g_file.getFileName()+"."+g_file.getExtension()).build());  // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
             System.out.println("파일 다운로드 성공");
 
             return new ResponseEntity<>(resource, headers, HttpStatus.OK);
