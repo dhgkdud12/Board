@@ -6,6 +6,7 @@ import spring.board.dao.JdbcCommentDao;
 import spring.board.dao.JdbcFileDao;
 import spring.board.dto.*;
 import spring.board.entity.Board;
+import spring.board.entity.Paging;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -51,11 +52,12 @@ public class BoardService {
         return null;
     }
 
-    public List<BoardResponse> selectAllPosts(int page) {
-        // 총 개수 가져와서 페이지정보 설정 - page 1일 때만 가져옴
-        // start, end index 계산해서 db에 넘겨줌
-        return boardDao.selectPost(page);
-        // ROWNUM 적용하고 stIdx, edIdx 받아서 게시물 출력
+    // 페이지
+    public List<BoardResponse> selectAllPosts(int page, int size) {
+        Paging paging = new Paging();
+        if (page == 1) paging.setTotalCnt(boardDao.getTotalCnt());
+        paging.setPaging(page, size);
+        return boardDao.selectPost(paging);
     }
 
     public BoardResponse selectPostByPostId(Integer bIdx) {
@@ -77,7 +79,7 @@ public class BoardService {
     }
 
     // 내 게시물 - 사용자 검색
-    public List<BoardResponse> selectPostByUserId(HttpServletRequest request) {
+    public List<BoardResponse> selectPostByUserId(int page, int size, HttpServletRequest request) {
         // 총 개수 가져와서 페이지정보 설정
         // 인덱스 1부터 10개만 출력
         // db에 startIndex 넘겨줌
@@ -85,7 +87,10 @@ public class BoardService {
         UserSession userSession = (UserSession) session.getAttribute("USER");
 
         if (userSession != null) {
-            return boardDao.selectPostByUserId(userSession.getIdx());
+            Paging paging = new Paging();
+            if (page == 1) paging.setTotalCnt(boardDao.getTotalCnt());
+            paging.setPaging(page, size);
+            return boardDao.selectPostByUserId(paging, userSession.getIdx());
         } else {
             System.out.println("로그인을 먼저 해주세요.");
             return null;

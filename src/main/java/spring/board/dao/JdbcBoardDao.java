@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import spring.board.dto.BoardResponse;
 import spring.board.dto.BoardUpdateRequest;
 import spring.board.entity.Board;
+import spring.board.entity.Paging;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,23 +49,44 @@ public class JdbcBoardDao {
     }
 
     // 내가 쓴 게시물 가져오기
-    public List<BoardResponse> selectPostByUserId(Integer id) {
-        String query = "SELECT b.board_no, b.title, b.content, b.user_idx, u.name, b.create_date, b.update_date FROM board b inner join user u on b.user_idx = u.idx WHERE b.user_idx = ?";
+    public List<BoardResponse> selectPostByUserId(Paging paging, Integer id) {
+//        String query = "SELECT b.board_no, b.title, b.content, b.user_idx, u.name, b.create_date, b.update_date FROM board b inner join user u on b.user_idx = u.idx WHERE b.user_idx = ?";
+        String query = "SELECT board_no, title, content, user_idx, name, create_date, update_date \n" +
+                "FROM \n" +
+                "(SELECT ROW_NUMBER() OVER ( ORDER BY board_no ASC) AS row_num, board_no, title, content, user_idx, create_date, update_date \n" +
+                "FROM board WHERE user_idx = ?) b INNER JOIN user u ON b.user_idx = u.idx\n" +
+                "WHERE row_num BETWEEN ? AND ? " +
+                "ORDER BY row_num";
         try {
-            return jdbcTemplate.query(query, new JdbcBoardDao.BoardRespMapper(), id);
+            return jdbcTemplate.query(query, new JdbcBoardDao.BoardRespMapper(), id, paging.getStartIndex(), paging.getEndIndex());
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
 
+    public Integer getTotalCnt() {
+        String query = "select count(*) from board";
+        return jdbcTemplate.queryForObject(query, Integer.class);
+    }
+
     // 게시물 전체 가져오기
-    public List<BoardResponse> selectPost(int page) {
-        String query = "SELECT b.board_no, b.title, b.content, b.user_idx, u.name, b.create_date, b.update_date FROM board b inner join user u on b.user_idx = u.idx ORDER BY b.board_no ASC LIMIT 10 OFFSET ?;";
+    public List<BoardResponse> selectPost(Paging paging) {
+//        String query = "SELECT b.board_no, b.title, b.content, b.user_idx, u.name, b.create_date, b.update_date FROM board b inner join user u on b.user_idx = u.idx ORDER BY b.board_no ASC LIMIT 10 OFFSET ?";
+        String query = "SELECT board_no, title, content, user_idx, name, create_date, update_date \n" +
+                "FROM \n" +
+                "(SELECT ROW_NUMBER() OVER ( ORDER BY board_no ASC) AS row_num, board_no, title, content, user_idx, create_date, update_date \n" +
+                "FROM board) b INNER JOIN user u ON b.user_idx = u.idx\n" +
+                "WHERE row_num BETWEEN ? AND ? " +
+                "ORDER BY row_num";
         try {
-            return jdbcTemplate.query(query, new JdbcBoardDao.BoardRespMapper(),(page-1)*10);
+            return jdbcTemplate.query(query, new JdbcBoardDao.BoardRespMapper(),paging.getStartIndex(), paging.getEndIndex());
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    public BoardResponse searchPosts(String q) {
+        return null;
     }
 
 
