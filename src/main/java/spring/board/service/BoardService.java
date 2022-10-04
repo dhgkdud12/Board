@@ -20,14 +20,16 @@ import java.util.List;
 public class BoardService {
     private final UserService userService;
     private final FileService fileService;
+    private final CommentService commentService;
     private final JdbcBoardDao boardDao;
     private final JdbcFileDao fileDao;
     private final JdbcCommentDao commentDao;
 
 
-    public BoardService(UserService userService, FileService fileService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao) {
+    public BoardService(UserService userService, FileService fileService, CommentService commentService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao) {
         this.userService = userService;
         this.fileService = fileService;
+        this.commentService = commentService;
         this.boardDao = boardDao;
         this.fileDao = fileDao;
         this.commentDao = commentDao;
@@ -69,7 +71,7 @@ public class BoardService {
         FileResponse fileResponse;
         if (file == null) fileResponse = null;
         else fileResponse = new FileResponse(file.getFileNo(), file.getFileName(), file.getPath());
-        BoardInfoResponse boardInfoResponse = new BoardInfoResponse(boardDao.selectPostNByPostId(bIdx), fileResponse, commentDao.selectCommentsByPostId(bIdx));
+        BoardInfoResponse boardInfoResponse = new BoardInfoResponse(boardDao.selectPostNByPostId(bIdx), fileResponse, commentService.selectCommentsByPostId(bIdx));
         return boardInfoResponse;
     }
 

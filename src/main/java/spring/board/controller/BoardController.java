@@ -70,7 +70,7 @@ public class BoardController {
     }
 
     @GetMapping("/{bIdx}/comment/{cIdx}")
-    public List<CommentResponse> selectComment(@PathVariable("bIdx") Integer bIdx) {
+    public List<CommentListDto> selectComment(@PathVariable("bIdx") Integer bIdx) {
         return commentService.selectCommentsByPostId(bIdx);
     }
 

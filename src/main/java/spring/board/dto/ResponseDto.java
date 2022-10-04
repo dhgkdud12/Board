@@ -1,6 +1,6 @@
 package spring.board.dto;
 
-public class ResponseDTO {
+public class ResponseDto {
     private String resultCode;
     private Object res;
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.util.List;
 
 @Getter
@@ -13,6 +14,8 @@ import java.util.List;
 public class BoardInfoResponse {
     private BoardResponse boardResponse;
     private FileResponse fileResponse;
-    private List<CommentResponse> commentResponses;
+    private List<CommentListDto> commentListDtos;
+
+    // 페이지 정보?
 }
 
