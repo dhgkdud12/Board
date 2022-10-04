@@ -28,12 +28,12 @@ public class BoardController {
 
     // 홈화면
     @GetMapping("")
-    public List<BoardResponse> home(@Param("page") int page, HttpServletRequest request) {
+    public List<BoardResponse> home(@RequestParam(name = "page", required = false) int page, @RequestParam(name = "size", value = "10", required = false) int size, HttpServletRequest request) {
         UserSession userSession = userService.getLoginUserInfo(request);
         if (userSession != null) {
             System.out.println(userSession.getName()+"님 로그인중");
         }
-        return boardService.selectAllPosts(page);
+        return boardService.selectAllPosts(page, size);
     }
 
 
@@ -70,7 +70,7 @@ public class BoardController {
     }
 
     @GetMapping("/{bIdx}/comment/{cIdx}")
-    public List<CommentResponse> selectComment(@PathVariable("bIdx") Integer bIdx) {
+    public List<CommentListDto> selectComment(@PathVariable("bIdx") Integer bIdx) {
         return commentService.selectCommentsByPostId(bIdx);
     }
 

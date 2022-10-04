@@ -8,22 +8,36 @@ public class Paging {
     10개씩 넘기기, 맨 첫페이지, 맨 마지막페이지
      */
 
-    private int pageSize = 10; // 10개씩 출력
-    private int curPage = 1;  // 현재 페이지
-    private int totalCnt; // 총 게시글 수
-    private int pageCnt; // 총 페이지 수
-    private int startPage = 1; // 시작 페이지
-    private int endPage = 1; // 마지막 페이지
-    private int startIndex = 0; // 시작 index - ??
-    private int prevPage; // 이전 페이지
-    private int nextPage; // 다음 페이지
+    // 프론트 입력 받을 데이터 2개
+    private int pageSize; // 10개씩 출력, 출력할 사이즈
+    private int curPage = 1;  // 현재 페이지 2
+    
+    
+    private int totalCnt; // 총 게시글 수 143개라면
+    private int pageCnt; // 총 페이지 수 15
+    
+    // 20부터 30까지 출력
+    
+    private int startPage = 1;
+    private int endPage;
+    private int startIndex = 0;
+    private int endIndex;
+    private int prevPage;
+    private int nextPage;
 
+    private int blockSize = 10;
+    
+    private int totalBlockCnt; // 총 블록 사이즈
 
-    public Paging(int totalCnt, int curPage) { // 총 게시물수, 현재 페이지
-        setCurPage(curPage); // 현재 페이지
+    public void setPaging(int page, int size) { // 총 게시물수, 현재 페이지
+        setCurPage(page); // 현재 페이지
+        setPageSize(size);
         setTotalCnt(totalCnt); // 총 게시물 수
-        setPageCnt(totalCnt);
-        setStartIndex(curPage); // startIdx
+        setPageCnt(totalCnt); // 페이지수 계산
+        setEndPage(pageCnt);
+        setStartIndex(page); // startIdx
+        setEndIndex(page); // endIdx
+        setTotalBlockCnt(pageCnt);
     }
 
     public int getPageSize() {
@@ -54,12 +68,24 @@ public class Paging {
         return startIndex;
     }
 
+    public int getEndIndex() {
+        return endIndex;
+    }
+
     public int getPrevPage() {
         return prevPage;
     }
 
     public int getNextPage() {
         return nextPage;
+    }
+
+    public int getBlockSize() {
+        return blockSize;
+    }
+
+    public int getTotalBlockCnt() {
+        return totalBlockCnt;
     }
 
     public void setPageSize(int pageSize) {
@@ -82,19 +108,33 @@ public class Paging {
         this.startPage = startPage;
     }
 
-    public void setEndPage(int endPage) {
-        this.endPage = endPage;
+    public void setEndPage(int pageCnt) {
+        this.endPage = pageCnt;
     }
 
     public void setStartIndex(int curPage) {
         this.startIndex = (curPage - 1) * pageSize;
     }
 
-    public void setPrevPage(int prevPage) {
-        this.prevPage = prevPage;
+    public void setEndIndex(int curPage) {
+        this.endIndex = curPage * pageSize;
     }
 
-    public void setNextPage(int nextPage) {
-        this.nextPage = nextPage;
+    public void setPrevPage(int curPage) {
+        if (curPage == 1) this.prevPage = 1;
+        else this.prevPage = curPage - 1;
+    }
+
+    public void setNextPage(int curPage) {
+        if (curPage == endPage) this.nextPage = curPage;
+        else this.nextPage = curPage + 1;
+    }
+
+    public void setBlockSize(int blockSize) {
+        this.blockSize = blockSize;
+    }
+
+    public void setTotalBlockCnt(int pageCnt) {
+        this.totalBlockCnt =  (int)Math.ceil(pageCnt/blockSize)+1;
     }
 }

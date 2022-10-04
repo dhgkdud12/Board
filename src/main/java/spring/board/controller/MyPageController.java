@@ -2,6 +2,7 @@ package spring.board.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import spring.board.dto.BoardResponse;
 import spring.board.dto.CommentResponse;
@@ -26,8 +27,8 @@ public class MyPageController {
 
     // 내가 작성한 글
     @GetMapping("/boards")
-    public List<BoardResponse> myBoards(HttpServletRequest request) {
-        return boardService.selectPostByUserId(request);
+    public List<BoardResponse> myBoards(@RequestParam(name = "page", required = false) int page, @RequestParam(name = "size", value = "10", required = false) int size, HttpServletRequest request) {
+        return boardService.selectPostByUserId(page, size, request);
     }
     
     // 내가 작성한 댓글
