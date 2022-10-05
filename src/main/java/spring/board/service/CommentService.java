@@ -72,7 +72,10 @@ public class CommentService {
             CommentResponse curComment = commentList.get(i);
             if (curComment.getParentId() == 0) {
                 CommentListDto commentListDto = createCommentListDto(curComment);
-                if (curComment.getChildCnt() > 0) resultCommentList.add(recursiveComment(commentList, 1, curComment.getCommentNo(), commentListDto));
+                if (curComment.getChildCnt() > 0) {
+                    recursiveComment(commentList, 1, curComment.getCommentNo(), commentListDto);
+                    resultCommentList.add(commentListDto);
+                }
                 else resultCommentList.add(commentListDto);
             }
         }
