@@ -26,83 +26,72 @@ public class CommentService {
         this.commentDao = commentDao;
     }
 
-    public List<CommentListDto> selectCommentsByPostId(Integer bIdx) {
-        List<CommentResponse> commentList = commentDao.selectCommentsByPostId(bIdx);
-        System.out.println("layer 0");
-        
-        // layer가 0인 댓글의 개수 가져와서 그만큼 arraylist 배열 만들고
-        // layer 1 넣어줌
-        HashMap<Integer, CommentListDto> hashMap = new HashMap<>();
-        for (int i = 0; i < commentList.size(); i++) {
-            if (commentList.get(i).getLayer() == 0) {
-                CommentResponse comment = commentList.get(i);
-                List<CommentListDto> commentLayer0 = new ArrayList<>();
-                CommentListDto commentListDto =
-                        CommentListDto.builder()
-                                .commentNo(comment.getCommentNo())
-                                .boardNo(comment.getBoardNo())
-                                .content(comment.getContent())
-                                .userIdx(comment.getUserIdx())
-                                .userName(comment.getUserName())
-                                .date(comment.getDate())
-                                .parentId(comment.getParentId())
-                                .groupNo(comment.getGroupNo())
-                                .layer(comment.getLayer())
-                                .childCnt(comment.getChildCnt())
-                                .groupOrd(comment.getGroupOrd())
-                                .commentListDtos(commentLayer0)
-                                .build();
-                hashMap.put(commentList.get(i).getCommentNo(), commentListDto);
-            }
-        }
-
-        System.out.println("layer 1");
-        for (int i = 0; i < commentList.size(); i++) {
-            if (commentList.get(i).getLayer() == 1) {
-                CommentListDto commentListDtoOrin = hashMap.get(commentList.get(i).getParentId());
-                List<CommentListDto> commentLayer1 = new ArrayList<>();
-                CommentListDto commentListDto =
-                        CommentListDto.builder()
-                                .commentNo(commentList.get(i).getCommentNo())
-                                .boardNo(commentList.get(i).getBoardNo())
-                                .content(commentList.get(i).getContent())
-                                .userIdx(commentList.get(i).getUserIdx())
-                                .userName(commentList.get(i).getUserName())
-                                .date(commentList.get(i).getDate())
-                                .parentId(commentList.get(i).getParentId())
-                                .groupNo(commentList.get(i).getGroupNo())
-                                .layer(commentList.get(i).getLayer())
-                                .childCnt(commentList.get(i).getChildCnt())
-                                .groupOrd(commentList.get(i).getGroupOrd())
-                                .commentListDtos(commentLayer1)
-                                .build();
-                commentListDtoOrin.getCommentListDtos().add(commentListDto);
-            }
-        }
-
-        System.out.println("layer 2");
-        for (int i = 1; i < commentList.size()+1; i++) {
-            if (commentList.get(i).getLayer() == 2) { // layer 2의 parentId 값이 comment_no인 List에 layer 2값 데이터 추가
-                System.out.println(hashMap.get(i).getCommentListDtos().size());
-                for (int j = 0; j < hashMap.get(i).getCommentListDtos().size() ; j++) {
-                    System.out.println(hashMap.get(i).getCommentListDtos().get(j).getCommentNo());
-
-                }
-
-            }
-        }
-
-        List<CommentListDto> commentListDtos = new ArrayList<>();
-        for (int i = 1; i < hashMap.size()+1; i++) {
-            commentListDtos.add(hashMap.get(i));
-        }
-
-        return commentListDtos;
+    private CommentListDto createCommentListDto(CommentResponse commentResponse) {
+        List<CommentListDto> commentLayer = new ArrayList<>();
+        CommentListDto curCommentListDto =
+                CommentListDto.builder()
+                        .commentNo(commentResponse.getCommentNo())
+                        .boardNo(commentResponse.getBoardNo())
+                        .content(commentResponse.getContent())
+                        .userIdx(commentResponse.getUserIdx())
+                        .userName(commentResponse.getUserName())
+                        .date(commentResponse.getDate())
+                        .parentId(commentResponse.getParentId())
+                        .groupNo(commentResponse.getGroupNo())
+                        .layer(commentResponse.getLayer())
+                        .childCnt(commentResponse.getChildCnt())
+                        .groupOrd(commentResponse.getGroupOrd())
+                        .commentListDtos(commentLayer)
+                        .build();
+        return curCommentListDto;
     }
 
-//    public List<CommentListDto> saveList(CommentResponse) {
-//        re
-//    }
+    private CommentListDto recursiveComment (List<CommentResponse> commentList, Integer layer, Integer commentNo, CommentListDto commentListDto) {
+        for (int i = 0; i < commentList.size(); i++) {
+            CommentResponse curComment = commentList.get(i);
+            Integer parentId = curComment.getParentId();
+            if (parentId != 0 ) {
+                if (commentNo == parentId && layer == curComment.getLayer()) {
+                    CommentListDto curCommentListDto = createCommentListDto(curComment);
+                    commentListDto.getCommentListDtos().add(curCommentListDto);
+                    if (curComment.getChildCnt() > 0) {
+                        return recursiveComment(commentList, layer+1, curComment.getCommentNo(), curCommentListDto);
+                    } else return commentListDto;
+                }
+            }
+        }
+        return commentListDto;
+    }
+
+    public List<CommentListDto> selectCommentsByPostId(Integer bIdx) {
+        List<CommentResponse> commentList = commentDao.selectCommentsByPostId(bIdx); // 게시물에 대한 모든 댓글 정보
+        List<CommentListDto> resultCommentList = new ArrayList<>();
+        
+        // 부모 id가 null이면 list 생성, 재귀함수 호출
+        for (int i = 0; i < commentList.size(); i++) {
+            CommentResponse curComment = commentList.get(i);
+            if (curComment.getParentId() == 0) {
+                CommentListDto commentListDto = createCommentListDto(curComment);
+                if (curComment.getChildCnt() > 0) resultCommentList.add(recursiveComment(commentList, 1, curComment.getCommentNo(), commentListDto));
+                else resultCommentList.add(commentListDto);
+            }
+        }
+        
+        return resultCommentList;
+    }
+
+    private List<CommentListDto> addCommentList(List<CommentListDto> parent, List<CommentListDto> child) {
+        for (int i = 0; i < parent.size(); i++) {
+            Integer commentId = parent.get(i).getCommentNo();
+            for (int j = 0; j < child.size(); j++) {
+                Integer parentId = child.get(j).getParentId();
+                if (commentId == parentId) {
+                    parent.get(i).getCommentListDtos().add(child.get(j));
+                }
+            }
+        }
+        return parent;
+    }
 
     public String post(Integer bIdx, CommentRequest commentRequest, HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -121,8 +110,12 @@ public class CommentService {
                 else comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), commentRequest.getParentId(), null, 0, 0, 0);
             }
 
-            commentDao.insertComment(comment);
+            System.out.println(commentDao.insertComment(comment));
             return "댓글 작성 완료";
+
+//            if (commentDao.insertComment(comment) != 0) {
+//                System.out.println();
+//            }
         } else {
             System.out.println("로그인을 먼저 해주세요.");
         }
