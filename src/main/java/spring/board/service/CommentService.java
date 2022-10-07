@@ -47,19 +47,41 @@ public class CommentService {
     }
 
     private CommentDto recursiveComment (List<CommentResponse> commentList, Integer layer, Integer parentId, CommentDto commentDto) {
-        for (int i = 0; i < commentList.size(); i++) {
+
+        for (int i = 0; i < commentList.size(); i++) { // 자식수
             CommentResponse curComment = commentList.get(i);
             Integer curParentId = curComment.getParentId();
-            if (curComment.getParentId() == 0) continue;
+//            if (parentId == 0 || curParentId == 0) continue;
 
-            System.out.println("0: "+ parentId + " " + curComment.getParentId() + " " + curComment.getCommentNo());
+//            System.out.println("parentId != 0일 때 0: "+ parentId + " " + curComment.getParentId() + " " + curComment.getCommentNo());
 
-            if (Objects.equals(curParentId, parentId) && Objects.equals(layer, curComment.getLayer())) {
-                System.out.println("1: "+ curComment.getParentId() + " " + curComment.getCommentNo());
+            if (Objects.equals(curParentId, parentId) && (curComment.getLayer() == layer)) {
+//                System.out.println("부모 id 같을 때 1: "+ parentId + " " + curParentId + " " + curComment.getCommentNo());
                 CommentDto curCommentDto = createCommentListDto(curComment);
                 commentDto.getCommentDtos().add(curCommentDto);
 //                System.out.println(curCommentDto.getCommentNo() + " " + curCommentDto.getContent());
-                return recursiveComment(commentList, layer+1, curComment.getCommentNo(), curCommentDto);
+                // 자식 수 가져와서 
+                // 자식 수만큼 반환
+                List<CommentDto> commentDtos = new ArrayList<>(); //자식 수
+                for (int j = 0; j <commentList.size(); j++) {
+                    if (commentList.get(j).getParentId() == curCommentDto.getCommentNo()) {
+                        CommentDto commentDtoT = createCommentListDto(commentList.get(j)); // 댓글1, 댓글2 하위
+                        commentDtos.add(commentDtoT); //
+                    }
+                }
+
+//                for (int j = 0; j < commentDtos.size(); j++) {
+//                    System.out.println(commentDtos.get(j).getCommentNo() + " " + commentDtos.get(j).getContent());
+//                }
+
+                for (int j = 0; j < commentDtos.size() ; j++) { // 댓글1의 댓글1의 댓글1, 댓글1의 댓글1의 댓글2
+                    commentDto.getCommentDtos().add(commentDtos.get(j));
+                    recursiveComment(commentList, layer+1, commentDtos.get(j).getCommentNo(), commentDto.getCommentDtos().get(j)); // 마지막 거 반환
+                }
+
+//                return recursiveComment(commentList, layer+1, curComment.getCommentNo(), curCommentDto);
+            } else {
+//                System.out.println("부모 id 다를 때 2: "+ parentId + " " + curParentId + " " + curComment.getCommentNo());
             }
         }
         return commentDto;
@@ -72,9 +94,25 @@ public class CommentService {
         for (int i = 0; i < commentList.size(); i++) {
             CommentResponse curComment = commentList.get(i);
             if (curComment.getParentId() == 0) { // 부모 id가 0이면 댓글리스트 생성
-                CommentDto commentDto = createCommentListDto(curComment);
+                CommentDto commentDto = createCommentListDto(curComment); // 댓글1, 댓글2, 댓글3, 댓글4
 //                System.out.println(curComment.getCommentNo()); - ok
-                recursiveComment(commentList, 1, curComment.getCommentNo(), commentDto);
+                List<CommentDto> commentDtos = new ArrayList<>(); //자식 수
+                for (int j = 0; j <commentList.size() ; j++) {
+                    if (commentList.get(j).getParentId() == commentDto.getCommentNo()) {
+                        CommentDto commentDtoT = createCommentListDto(commentList.get(j)); // 댓글1, 댓글2 하위
+                        commentDtos.add(commentDtoT); //
+                    }
+                }
+
+                for (int j = 0; j < commentDtos.size(); j++) {
+//                    System.out.println(commentDtos.get(j).getCommentNo() + " " + commentDtos.get(j).getContent());
+                }
+                for (int j = 0; j < commentDtos.size() ; j++) { // 댓글1의 댓글1의 댓글1, 댓글1의 댓글1의 댓글2
+                    commentDto.getCommentDtos().add(commentDtos.get(j));
+                    recursiveComment(commentList, 2, commentDtos.get(j).getCommentNo(), commentDto.getCommentDtos().get(j)); // 마지막 거 반환
+                }
+
+
                 resultCommentList.add(commentDto);
 
             }
