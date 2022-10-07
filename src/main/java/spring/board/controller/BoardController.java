@@ -1,9 +1,9 @@
 package spring.board.controller;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import spring.board.dto.*;
+import spring.board.entity.Paging;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 import spring.board.service.UserService;
@@ -11,7 +11,10 @@ import spring.board.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("board")
@@ -28,12 +31,20 @@ public class BoardController {
 
     // 홈화면
     @GetMapping("")
-    public List<BoardResponse> home(@RequestParam(name = "page", required = false) int page, @RequestParam(name = "size", value = "10", required = false) int size, HttpServletRequest request) {
+    public Map home(
+            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(name = "blockSize", required = false, defaultValue = "5") int blockSize,
+            HttpServletRequest request) {
+        Map<String, Object> resultMap = new HashMap<>();
         UserSession userSession = userService.getLoginUserInfo(request);
         if (userSession != null) {
             System.out.println(userSession.getName()+"님 로그인중");
         }
-        return boardService.selectAllPosts(page, size);
+        resultMap.put("boardInfo", boardService.selectAllPosts(page, size, blockSize));
+        resultMap.put("pageInfo", boardService.getPagingInfo(page, size, blockSize));
+
+        return resultMap;
     }
 
 
@@ -70,7 +81,7 @@ public class BoardController {
     }
 
     @GetMapping("/{bIdx}/comment/{cIdx}")
-    public List<CommentListDto> selectComment(@PathVariable("bIdx") Integer bIdx) {
+    public List<CommentDto> selectComment(@PathVariable("bIdx") Integer bIdx) {
         return commentService.selectCommentsByPostId(bIdx);
     }
 

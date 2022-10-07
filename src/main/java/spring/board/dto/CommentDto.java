@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CommentListDto {
+public class CommentDto {
     private Integer commentNo;
     private Integer boardNo;
     private String content;
@@ -24,5 +24,5 @@ public class CommentListDto {
     private Integer childCnt;
     private Integer groupOrd;
 
-    private List<CommentListDto> commentListDtos;
+    private List<CommentDto> commentDtos;
 }

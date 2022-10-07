@@ -23,7 +23,6 @@ public class BoardService {
     private final CommentService commentService;
     private final JdbcBoardDao boardDao;
     private final JdbcFileDao fileDao;
-    private final JdbcCommentDao commentDao;
 
 
     public BoardService(UserService userService, FileService fileService, CommentService commentService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao) {
@@ -32,7 +31,6 @@ public class BoardService {
         this.commentService = commentService;
         this.boardDao = boardDao;
         this.fileDao = fileDao;
-        this.commentDao = commentDao;
     }
 
 
@@ -55,11 +53,16 @@ public class BoardService {
     }
 
     // 페이지
-    public List<BoardResponse> selectAllPosts(int page, int size) {
+    public List<BoardResponse> selectAllPosts(int page, int size, int blockSize) {
         Paging paging = new Paging();
-        if (page == 1) paging.setTotalCnt(boardDao.getTotalCnt());
-        paging.setPaging(page, size);
+        paging.setPaging(page, size, blockSize, boardDao.getTotalCnt());
         return boardDao.selectPost(paging);
+    }
+
+    public PageInfo getPagingInfo(int page, int size, int blockSize) {
+        Paging paging = new Paging();
+        paging.setPaging(page, size, blockSize, boardDao.getTotalCnt());
+        return new PageInfo(paging);
     }
 
     public BoardResponse selectPostByPostId(Integer bIdx) {
@@ -71,8 +74,7 @@ public class BoardService {
         FileResponse fileResponse;
         if (file == null) fileResponse = null;
         else fileResponse = new FileResponse(file.getFileNo(), file.getFileName(), file.getPath());
-        BoardInfoResponse boardInfoResponse = new BoardInfoResponse(boardDao.selectPostNByPostId(bIdx), fileResponse, commentService.selectCommentsByPostId(bIdx));
-        return boardInfoResponse;
+        return new BoardInfoResponse(boardDao.selectPostNByPostId(bIdx), fileResponse, commentService.selectCommentsByPostId(bIdx));
     }
 
     public List<BoardResponse> selectPostAndCommentByPostId(Integer bIdx) {
@@ -81,17 +83,13 @@ public class BoardService {
     }
 
     // 내 게시물 - 사용자 검색
-    public List<BoardResponse> selectPostByUserId(int page, int size, HttpServletRequest request) {
-        // 총 개수 가져와서 페이지정보 설정
-        // 인덱스 1부터 10개만 출력
-        // db에 startIndex 넘겨줌
+    public List<BoardResponse> selectPostByUserId(int page, int size, int blockSize, HttpServletRequest request) {
         HttpSession session = request.getSession();
         UserSession userSession = (UserSession) session.getAttribute("USER");
 
         if (userSession != null) {
             Paging paging = new Paging();
-            if (page == 1) paging.setTotalCnt(boardDao.getTotalCnt());
-            paging.setPaging(page, size);
+            paging.setPaging(page, size, blockSize, boardDao.getTotalCnt());
             return boardDao.selectPostByUserId(paging, userSession.getIdx());
         } else {
             System.out.println("로그인을 먼저 해주세요.");
