@@ -46,19 +46,21 @@ public class CommentService {
         return curCommentDto;
     }
 
-    private CommentDto recursiveComment (List<CommentResponse> commentList, Integer layer, Integer commentNo, CommentDto commentDto) {
+    private CommentDto recursiveComment (List<CommentResponse> commentList, Integer layer, Integer parentId, CommentDto commentDto) {
         for (int i = 0; i < commentList.size(); i++) {
             CommentResponse curComment = commentList.get(i);
-            Integer parentId = curComment.getParentId();
+            Integer curParentId = curComment.getParentId();
+            if (curComment.getParentId() == 0) continue;
 
-            if (Objects.equals(commentNo, parentId) && Objects.equals(layer, curComment.getLayer())) {
+            System.out.println("0: "+ parentId + " " + curComment.getParentId() + " " + curComment.getCommentNo());
+
+            if (Objects.equals(curParentId, parentId) && Objects.equals(layer, curComment.getLayer())) {
+                System.out.println("1: "+ curComment.getParentId() + " " + curComment.getCommentNo());
                 CommentDto curCommentDto = createCommentListDto(curComment);
                 commentDto.getCommentDtos().add(curCommentDto);
-                if (curComment.getChildCnt() > 0) {
-                    return recursiveComment(commentList, layer+1, curComment.getCommentNo(), curCommentDto);
-                } else return commentDto;
+//                System.out.println(curCommentDto.getCommentNo() + " " + curCommentDto.getContent());
+                return recursiveComment(commentList, layer+1, curComment.getCommentNo(), curCommentDto);
             }
-
         }
         return commentDto;
     }
@@ -71,10 +73,10 @@ public class CommentService {
             CommentResponse curComment = commentList.get(i);
             if (curComment.getParentId() == 0) { // 부모 id가 0이면 댓글리스트 생성
                 CommentDto commentDto = createCommentListDto(curComment);
-                if (curComment.getChildCnt() > 0) { // 자식 댓글이 1이상이면 재귀함수 호출
-                    recursiveComment(commentList, 1, curComment.getCommentNo(), commentDto);
-                }
+//                System.out.println(curComment.getCommentNo()); - ok
+                recursiveComment(commentList, 1, curComment.getCommentNo(), commentDto);
                 resultCommentList.add(commentDto);
+
             }
         }
         
@@ -108,8 +110,9 @@ public class CommentService {
                     System.out.println("답글달 댓글이 존재하지 않음");
                     return "댓글 작성 실패";
                 }
-                else comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), commentRequest.getParentId(), null, 0, 0, 0);
             }
+            comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), commentRequest.getParentId(), null, 0, 0, 0);
+            commentDao.insertComment(comment);
 
             return "댓글 작성 완료";
 
