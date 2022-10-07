@@ -14,7 +14,7 @@ import java.util.List;
 public class BoardInfoResponse {
     private BoardResponse boardResponse;
     private FileResponse fileResponse;
-    private List<CommentListDto> commentListDtos;
+    private List<CommentDto> commentDtos;
 
     // 페이지 정보?
 }

@@ -1,5 +1,8 @@
 package spring.board.entity;
 
+import lombok.Getter;
+
+@Getter
 public class Paging {
 
     /*
@@ -25,67 +28,20 @@ public class Paging {
     private int prevPage;
     private int nextPage;
 
-    private int blockSize = 10;
+    private int blockSize;
     
     private int totalBlockCnt; // 총 블록 사이즈
 
-    public void setPaging(int page, int size) { // 총 게시물수, 현재 페이지
+    public void setPaging(int page, int size, int blockSize, int totalCnt) { // 총 게시물수, 현재 페이지
         setCurPage(page); // 현재 페이지
         setPageSize(size);
         setTotalCnt(totalCnt); // 총 게시물 수
         setPageCnt(totalCnt); // 페이지수 계산
-        setEndPage(pageCnt);
+        setEndPage(this.pageCnt);
         setStartIndex(page); // startIdx
         setEndIndex(page); // endIdx
-        setTotalBlockCnt(pageCnt);
-    }
-
-    public int getPageSize() {
-        return pageSize;
-    }
-
-    public int getCurPage() {
-        return curPage;
-    }
-
-    public int getTotalCnt() {
-        return totalCnt;
-    }
-
-    public int getPageCnt() {
-        return pageCnt;
-    }
-
-    public int getStartPage() {
-        return startPage;
-    }
-
-    public int getEndPage() {
-        return endPage;
-    }
-
-    public int getStartIndex() {
-        return startIndex;
-    }
-
-    public int getEndIndex() {
-        return endIndex;
-    }
-
-    public int getPrevPage() {
-        return prevPage;
-    }
-
-    public int getNextPage() {
-        return nextPage;
-    }
-
-    public int getBlockSize() {
-        return blockSize;
-    }
-
-    public int getTotalBlockCnt() {
-        return totalBlockCnt;
+        setBlockSize(blockSize);
+        setTotalBlockCnt(this.pageCnt);
     }
 
     public void setPageSize(int pageSize) {
@@ -120,15 +76,15 @@ public class Paging {
         this.endIndex = curPage * pageSize;
     }
 
-    public void setPrevPage(int curPage) {
-        if (curPage == 1) this.prevPage = 1;
-        else this.prevPage = curPage - 1;
-    }
-
-    public void setNextPage(int curPage) {
-        if (curPage == endPage) this.nextPage = curPage;
-        else this.nextPage = curPage + 1;
-    }
+//    public void setPrevPage(int curPage) {
+//        if (curPage == 1) this.prevPage = 1;
+//        else this.prevPage = curPage - 1;
+//    }
+//
+//    public void setNextPage(int curPage) {
+//        if (curPage == endPage) this.nextPage = curPage;
+//        else this.nextPage = curPage + 1;
+//    }
 
     public void setBlockSize(int blockSize) {
         this.blockSize = blockSize;
