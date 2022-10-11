@@ -11,7 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import spring.board.dao.JdbcTemplate.JdbcFileDao;
+import spring.board.dao.JdbcFileDao;
 import spring.board.dto.BoardRequest;
 import spring.board.dto.FileRequest;
 import spring.board.entity.FileEntity;

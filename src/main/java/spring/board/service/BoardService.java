@@ -1,9 +1,9 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
-import spring.board.dao.JdbcTemplate.JdbcBoardDao;
-import spring.board.dao.JdbcTemplate.JdbcCommentDao;
-import spring.board.dao.JdbcTemplate.JdbcFileDao;
+import spring.board.dao.JdbcBoardDao;
+import spring.board.dao.JdbcCommentDao;
+import spring.board.dao.JdbcFileDao;
 import spring.board.dto.*;
 import spring.board.entity.Board;
 import spring.board.entity.Paging;

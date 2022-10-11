@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- SQL문과 설정이 담겨짐 -->
+<mapper namespace="spring.board.dao.UserMapper">
+<!--mapper namespace : 이 매퍼코드와 1대1 매핑을 시킬 객체를 지정, 객체에 있는 메소드명과 동이란 이름을 가진 select 생성-->
+    <select id="findAll" resultType="HashMap">
+        select * from tb_user
+    </select>
 
-<mappers>
-    <mapper namespace="spring.board.dao.MyBatis.UserMapper">
-        <select id="selectUser" parameterType="String" resultType="spring.board.entity.User">
-            select * from user where id = #{id}
-        </select>
-        <insert id="insertUser" parameterType="spring.board.dto.UserRequest">
-            insert into user(id, name, password, email)
-            values (#{id}, #{name}, #{password}, #{email})
-        </insert>
-    </mapper>
-
-    <mapper namespace="spring.board.dao.MyBatis.BoardMapper">
-
-    </mapper>
-
-    <mapper namespace="spring.board.dao.MyBatis.FileMapper">
-
-    </mapper>
-
-    <mapper namespace="spring.board.dao.MyBatis.CommentMapper">
-
-    </mapper>
-</mappers>
+    <!-- 뉴스 조회 -->
+<!--    <select id="listNews" resultType="dev.zeronelab.mybatis.vo.NewsEntity">-->
+<!--        select title, journalist, publisher, reg_dt from news-->
+<!--    </select>-->
+<!-- resultType : 결과를 어떤 Entity로 받을 것인지를 나타냄    -->
+</mapper>
