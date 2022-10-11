@@ -1,4 +1,4 @@
-package spring.board.dao;
+package spring.board.dao.JdbcTemplate;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;

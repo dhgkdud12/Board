@@ -2,7 +2,7 @@ package spring.board.service;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-import spring.board.dao.JdbcUserDao;
+import spring.board.dao.MyBatis.UserMapper;
 import spring.board.dto.UserLoginRequest;
 import spring.board.dto.UserRequest;
 import spring.board.dto.UserSession;
@@ -13,16 +13,23 @@ import javax.servlet.http.HttpSession;
 
 @Service
 public class UserService {
-    private final JdbcUserDao userDao;
+//    private final JdbcUserDao userDao;
 
-    public UserService(JdbcUserDao userDao) {
-        this.userDao = userDao;
+//    public UserService(JdbcUserDao userDao) {
+//        this.userDao = userDao;
+//    }
+    private final UserMapper userMapper;
+
+    public UserService(UserMapper userMapper) {
+        this.userMapper = userMapper;
     }
+
 
     public String register(UserRequest userRequest) {
         String hashPassword = BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt());
         userRequest.setPassword(hashPassword);
-        userDao.insertUser(userRequest);
+//        userDao.insertUser(userRequest);
+        userMapper.insertUser(userRequest);
         return "회원가입 완료";
     }
 
@@ -33,7 +40,8 @@ public class UserService {
         }
 
         // 아이디 확인
-        User loginUser = userDao.selectUser(userLoginRequest.getId());
+        User loginUser = userMapper.selectUser(userLoginRequest.getId());
+//                userDao.selectUser(userLoginRequest.getId());
         if (loginUser == null) {
             System.out.println("사용자 id 없음");
         } else {
