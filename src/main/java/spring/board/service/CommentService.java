@@ -1,8 +1,8 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
-import spring.board.dao.JdbcBoardDao;
-import spring.board.dao.JdbcCommentDao;
+import spring.board.dao.JdbcTemplate.JdbcBoardDao;
+import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dto.*;
 import spring.board.entity.Comment;
 
@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
