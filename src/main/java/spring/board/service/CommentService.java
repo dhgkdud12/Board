@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
@@ -46,41 +47,125 @@ public class CommentService {
         return curCommentDto;
     }
 
-    private CommentDto recursiveComment (List<CommentResponse> commentList, Integer layer, Integer parentId, CommentDto commentDto) {
-        for (int i = 0; i < commentList.size(); i++) {
-            CommentResponse curComment = commentList.get(i);
-            Integer curParentId = curComment.getParentId();
-            if (curComment.getParentId() == 0) continue;
+//    private CommentDto recursiveComment (List<CommentResponse> commentList, Integer layer, Integer parentId, CommentDto commentDto) {
+//
+//        for (int i = 0; i < commentList.size(); i++) { // 자식수
+//            CommentResponse curComment = commentList.get(i);
+//            Integer curParentId = curComment.getParentId();
+////            if (parentId == 0 || curParentId == 0) continue;
+//
+////            System.out.println("parentId != 0일 때 0: "+ parentId + " " + curComment.getParentId() + " " + curComment.getCommentNo());
+//
+//            if (Objects.equals(curParentId, parentId) && (curComment.getLayer() == layer)) {
+////                System.out.println("부모 id 같을 때 1: "+ parentId + " " + curParentId + " " + curComment.getCommentNo());
+//                CommentDto curCommentDto = createCommentListDto(curComment);
+//                commentDto.getCommentDtos().add(curCommentDto);
+////                System.out.println(curCommentDto.getCommentNo() + " " + curCommentDto.getContent());
+//                // 자식 수 가져와서
+//                // 자식 수만큼 반환
+//                List<CommentDto> commentDtos = new ArrayList<>(); //자식 수
+//                for (int j = 0; j <commentList.size(); j++) {
+//                    if (commentList.get(j).getParentId() == curCommentDto.getCommentNo()) {
+//                        CommentDto commentDtoT = createCommentListDto(commentList.get(j)); // 댓글1, 댓글2 하위
+//                        commentDtos.add(commentDtoT); //
+//                    }
+//                }
+//
+////                for (int j = 0; j < commentDtos.size(); j++) {
+////                    System.out.println(commentDtos.get(j).getCommentNo() + " " + commentDtos.get(j).getContent());
+////                }
+//
+//                for (int j = 0; j < commentDtos.size() ; j++) { // 댓글1의 댓글1의 댓글1, 댓글1의 댓글1의 댓글2
+//                    commentDto.getCommentDtos().add(commentDtos.get(j));
+//                    recursiveComment(commentList, layer+1, commentDtos.get(j).getCommentNo(), commentDto.getCommentDtos().get(j)); // 마지막 거 반환
+//                }
+//
+////                return recursiveComment(commentList, layer+1, curComment.getCommentNo(), curCommentDto);
+//            } else {
+////                System.out.println("부모 id 다를 때 2: "+ parentId + " " + curParentId + " " + curComment.getCommentNo());
+//            }
+//        }
+//        return commentDto;
+//    }
 
-            System.out.println("0: "+ parentId + " " + curComment.getParentId() + " " + curComment.getCommentNo());
+//    public List<CommentDto> selectCommentsByPostId(Integer bIdx) {
+//        List<CommentResponse> commentList = commentDao.selectCommentsByPostId(bIdx); // 게시물에 대한 모든 댓글 정보
+//        List<CommentDto> resultCommentList = new ArrayList<>(); // 계층형된 댓글의 리스트
+//
+//        for (int i = 0; i < commentList.size(); i++) {
+//            CommentResponse curComment = commentList.get(i);
+//            if (curComment.getParentId() == 0) { // 부모 id가 0이면 댓글리스트 생성
+//                CommentDto commentDto = createCommentListDto(curComment); // 댓글1, 댓글2, 댓글3, 댓글4
+//                List<CommentDto> commentDtos = new ArrayList<>(); //자식 수
+//                for (int j = 0; j <commentList.size() ; j++) {
+//                    if (commentList.get(j).getParentId() == commentDto.getCommentNo()) {
+//                        CommentDto commentDtoT = createCommentListDto(commentList.get(j)); // 댓글1, 댓글2 하위
+//                        commentDtos.add(commentDtoT); //
+//                    }
+//                }
+//                for (int j = 0; j < commentDtos.size() ; j++) { // 댓글1의 댓글1의 댓글1, 댓글1의 댓글1의 댓글2
+//                    commentDto.getCommentDtos().add(commentDtos.get(j));
+//                    recursiveComment(commentList, 2, commentDtos.get(j).getCommentNo(), commentDto.getCommentDtos().get(j)); // 마지막 거 반환
+//                }
+//
+//
+//                resultCommentList.add(commentDto);
+//
+//            }
+//        }
+//
+//        return resultCommentList;
+//    }
 
-            if (Objects.equals(curParentId, parentId) && Objects.equals(layer, curComment.getLayer())) {
-                System.out.println("1: "+ curComment.getParentId() + " " + curComment.getCommentNo());
-                CommentDto curCommentDto = createCommentListDto(curComment);
-                commentDto.getCommentDtos().add(curCommentDto);
-//                System.out.println(curCommentDto.getCommentNo() + " " + curCommentDto.getContent());
-                return recursiveComment(commentList, layer+1, curComment.getCommentNo(), curCommentDto);
+    private List<CommentDto> recursiveComment (List<CommentResponse> list, Integer parentId, Integer layer) {
+        // stream - lamda
+//        List<CommentDto> childList = list.stream()
+//                .filter(r-> Objects.equals(r.getLayer(), layer))
+//                .filter(r-> Objects.equals(r.getParentId(), parentId))
+//                .map(this::createCommentListDto)
+//                .collect(Collectors.toList()); // 리스트로 변환
+//        childList.forEach(r-> {
+//            r.setCommentDtos(recursiveComment(list, r.getCommentNo(), layer+1));
+//        });
+
+        //foreach
+        List<CommentDto> childList = new ArrayList<>();
+        for (CommentResponse r : list) {
+            if (Objects.equals(r.getLayer(), layer) && Objects.equals(r.getParentId(), parentId)) {
+                childList.add(createCommentListDto(r));
             }
         }
-        return commentDto;
+        for (CommentDto r : childList) {
+            r.setCommentDtos(recursiveComment(list, r.getCommentNo(), layer+1));
+        }
+        return childList;
     }
 
-    public List<CommentDto> selectCommentsByPostId(Integer bIdx) {
-        List<CommentResponse> commentList = commentDao.selectCommentsByPostId(bIdx); // 게시물에 대한 모든 댓글 정보
-        List<CommentDto> resultCommentList = new ArrayList<>(); // 계층형된 댓글의 리스트
-        
-        for (int i = 0; i < commentList.size(); i++) {
-            CommentResponse curComment = commentList.get(i);
-            if (curComment.getParentId() == 0) { // 부모 id가 0이면 댓글리스트 생성
-                CommentDto commentDto = createCommentListDto(curComment);
-//                System.out.println(curComment.getCommentNo()); - ok
-                recursiveComment(commentList, 1, curComment.getCommentNo(), commentDto);
-                resultCommentList.add(commentDto);
 
+        public List<CommentDto> selectCommentsByPostId(Integer bIdx) {
+        List<CommentResponse> commentList = commentDao.selectCommentsByPostId(bIdx); // 전체 댓글 조회
+        List<CommentDto> respList = new ArrayList<>(); // 결과리스트 
+        for (CommentResponse comment : commentList) {
+            if (comment.getLayer() == 0) {
+                int groupNo = comment.getGroupNo();
+                // stream
+//                List<CommentResponse> groupList = commentList.stream()
+//                        .filter(r->r.getGroupNo() == groupNo)
+//                        .collect(Collectors.toList());
+
+                //foreach
+                List<CommentResponse> groupList = new ArrayList<>();
+                for (CommentResponse r : commentList) {
+                    if (r.getGroupNo() == groupNo) {
+                        groupList.add(r);
+                    }
+                }
+                CommentDto rootComment = createCommentListDto(comment);
+                rootComment.setCommentDtos(recursiveComment(groupList, rootComment.getCommentNo(), rootComment.getLayer() + 1));
+                respList.add(rootComment);
             }
         }
-        
-        return resultCommentList;
+        return respList;
     }
 
     private List<CommentDto> addCommentList(List<CommentDto> parent, List<CommentDto> child) {
