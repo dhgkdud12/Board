@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import spring.board.dao.JdbcTemplate.JdbcBoardDao;
 import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.JdbcTemplate.JdbcFileDao;
+import spring.board.dao.MyBatis.BoardMapper;
 import spring.board.dto.*;
 import spring.board.entity.Board;
 import spring.board.entity.Paging;
@@ -21,16 +22,18 @@ public class BoardService {
     private final UserService userService;
     private final FileService fileService;
     private final CommentService commentService;
+    private final BoardMapper boardMapper;
     private final JdbcBoardDao boardDao;
     private final JdbcFileDao fileDao;
 
 
-    public BoardService(UserService userService, FileService fileService, CommentService commentService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao) {
+    public BoardService(UserService userService, FileService fileService, CommentService commentService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao, BoardMapper boardMapper) {
         this.userService = userService;
         this.fileService = fileService;
         this.commentService = commentService;
         this.boardDao = boardDao;
         this.fileDao = fileDao;
+        this.boardMapper = boardMapper;
     }
 
 
@@ -41,7 +44,8 @@ public class BoardService {
 
         if (userSession != null) {
             Board board = new Board(null, boardRequest.getTitle(), boardRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), null);
-            int bIdx = boardDao.insertPost(board);
+//            int bIdx = boardDao.insertPost(board);
+            int bIdx = boardMapper.insertPost(board);
             if (boardRequest.getFile() != null) {
                 boardRequest.setId(bIdx);
                 return fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
@@ -55,8 +59,11 @@ public class BoardService {
     // 페이지
     public List<BoardResponse> selectAllPosts(int page, int size, int blockSize) {
         Paging paging = new Paging();
-        paging.setPaging(page, size, blockSize, boardDao.getTotalCnt());
-        return boardDao.selectPost(paging);
+//        paging.setPaging(page, size, blockSize, boardDao.getTotalCnt());
+//        return boardDao.selectPost(paging);
+        paging.setPaging(page, size, blockSize, boardMapper.getTotalCnt());
+        List<BoardResponse> list = boardMapper.selectPost(paging);
+        return list;
     }
 
     public PageInfo getPagingInfo(int page, int size, int blockSize) {

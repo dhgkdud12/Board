@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.board.dao.MyBatis.CommentMapper">
+    <insert id="insertComment" >
+        insert into comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord)
+        values (#{boardNo}, #{content}, #{userIdx}, #{date}, #{parentId}, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
+    </insert>
+
+    <resultMap id="boardMap" type="spring.board.dto.BoardResponse">
+    </resultMap>
+
+    <select id="selectGroupNoNotParent" parameterType="Integer" resultType="Integer" >
+        SELECT IFNULL(max(group_no),0)+1
+        FROM comment
+        <if test="parent_id == null ">
+            WHERE parent_id IS NULL
+        </if>
+        <if test="parent_id != null ">
+        WHERE parent_id = #{commentNo}
+        </if>
+    </select>
+
+    <select id="selectGroupNo" parameterType="Integer" resultType="Integer">
+        SELECT  IFNULL(max(group_ord), 0)+1
+        FROM comment
+        WHERE parent_id = #{commentNo}
+    </select>
+
+    <select id="selectCommentsByPostId">
+
+    </select>
+
+    <select id="selectCommentByCommentId">
+
+    </select>
+
+    <select id="selectCommentByUserId">
+
+    </select>
+
+    <delete id="deleteComment">
+
+    </delete>
+
+    <select id="selectCommentsByUserId">
+
+    </select>
+</mapper>

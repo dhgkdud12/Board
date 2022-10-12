@@ -3,7 +3,6 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mappers>
     <mapper namespace="spring.board.dao.MyBatis.UserMapper">
         <select id="selectUser" parameterType="String" resultType="spring.board.entity.User">
             select * from user where id = #{id}
@@ -13,16 +12,3 @@
             values (#{id}, #{name}, #{password}, #{email})
         </insert>
     </mapper>
-
-    <mapper namespace="spring.board.dao.MyBatis.BoardMapper">
-
-    </mapper>
-
-    <mapper namespace="spring.board.dao.MyBatis.FileMapper">
-
-    </mapper>
-
-    <mapper namespace="spring.board.dao.MyBatis.CommentMapper">
-
-    </mapper>
-</mappers>
