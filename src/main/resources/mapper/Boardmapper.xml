@@ -5,12 +5,12 @@
 
 <mapper namespace="spring.board.dao.MyBatis.BoardMapper">
     <insert id="insertPost" parameterType="spring.board.entity.Board">
-        INSERT INTO board(title, content, user_idx, create_date, update_date)
+        INSERT INTO board (title, content, user_idx, create_date, update_date)
         VALUES (#{title}, #{content}, #{userIdx}, #{createDate}, #{updateDate})
     </insert>
 
     <select id="selectPostByPostId" parameterType="Integer" resultType="spring.board.dto.BoardResponse">
-        SELECT b.board_no, b.title, b.content, b.user_idx, u.name, b.create_date, b.update_date
+        SELECT b.board_no, b.title, b.content, b.user_idx, u.user_name, b.create_date, b.update_date
         FROM board b
             inner join user u
                 on b.user_idx = u.idx
@@ -18,7 +18,7 @@
     </select>
 
     <select id="selectPostNByPostId" parameterType="Integer" resultType="spring.board.dto.BoardResponse">
-        SELECT b.board_no, b.title, b.content, b.user_idx, u.name, b.create_date, b.update_date
+        SELECT b.board_no, b.title, b.content, b.user_idx, u.user_name, b.create_date, b.update_date
         FROM board b
                  inner join user u
                             on b.user_idx = u.idx
@@ -26,10 +26,10 @@
     </select>
 
     <select id="selectPostByUserId" parameterType="spring.board.entity.Paging" resultType="spring.board.dto.BoardResponse">
-        SELECT board_no, title, content, user_idx, name, create_date, update_date
+        SELECT board_no, title, content, user_idx, user_name, create_date, update_date
         FROM
             (SELECT ROW_NUMBER() OVER ( ORDER BY board_no ASC) AS row_num, board_no, title, content, user_idx, create_date, update_date
-            FROM board) b
+            FROM board WHERE user_idx = #{id}) b
                 INNER JOIN user u ON b.user_idx = u.idx
         WHERE row_num BETWEEN ? AND ?
         ORDER BY row_num
@@ -51,10 +51,10 @@
     </resultMap>
 
     <select id="selectPost" parameterType= "spring.board.entity.Paging" resultMap="boardMap">
-        SELECT board_no, title, content, user_idx, name
-        <if test="startIndex  null and startIndex   '' ">
-             , create_date, update_date
-        </if>
+        SELECT b.board_no, b.title, b.content, b.user_idx, u.user_name, b.create_date, b.update_date
+<!--        <if test="startIndex  null and startIndex   '' ">-->
+<!--             , create_date, update_date-->
+<!--        </if>-->
         FROM
             (SELECT ROW_NUMBER() OVER ( ORDER BY board_no ASC) AS row_num, board_no, title, content, user_idx, create_date, update_date
              FROM board) b INNER JOIN user u ON b.user_idx = u.idx
@@ -65,11 +65,11 @@
     <update id="updatePost" parameterType="spring.board.dto.BoardUpdateRequest">
         UPDATE board
         SET title = #{title}, content = #{content}, update_date = #{updateDate}
-        where board_no = {boardNo}
+        where board_no = #{boardNo}
     </update>
 
     <delete id="deletePost" parameterType="Integer">
-        DELETE FROM board WHERE   board_no = #{bIdx}
+        DELETE FROM board WHERE board_no = #{bIdx}
     </delete>
 </mapper>
 <!--for문,        WHERE   board_no  IN #{post.bIdx}

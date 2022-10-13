@@ -5,6 +5,7 @@ import spring.board.dao.JdbcTemplate.JdbcBoardDao;
 import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.JdbcTemplate.JdbcFileDao;
 import spring.board.dao.MyBatis.BoardMapper;
+import spring.board.dao.MyBatis.FileMapper;
 import spring.board.dto.*;
 import spring.board.entity.Board;
 import spring.board.entity.Paging;
@@ -23,16 +24,18 @@ public class BoardService {
     private final FileService fileService;
     private final CommentService commentService;
     private final BoardMapper boardMapper;
-    private final JdbcBoardDao boardDao;
-    private final JdbcFileDao fileDao;
+//    private final JdbcBoardDao boardDao;
+//    private final JdbcFileDao fileDao;
+    private final FileMapper fileMapper;
 
 
-    public BoardService(UserService userService, FileService fileService, CommentService commentService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao, BoardMapper boardMapper) {
+    public BoardService(UserService userService, FileService fileService, CommentService commentService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao, BoardMapper boardMapper, FileMapper fileMapper) {
         this.userService = userService;
         this.fileService = fileService;
         this.commentService = commentService;
-        this.boardDao = boardDao;
-        this.fileDao = fileDao;
+//        this.boardDao = boardDao;
+        this.fileMapper = fileMapper;
+//        this.fileDao = fileDao;
         this.boardMapper = boardMapper;
     }
 
@@ -68,20 +71,25 @@ public class BoardService {
 
     public PageInfo getPagingInfo(int page, int size, int blockSize) {
         Paging paging = new Paging();
-        paging.setPaging(page, size, blockSize, boardDao.getTotalCnt());
+//        paging.setPaging(page, size, blockSize, boardDao.getTotalCnt());
+        paging.setPaging(page, size, blockSize, boardMapper.getTotalCnt());
         return new PageInfo(paging);
     }
 
     public BoardResponse selectPostByPostId(Integer bIdx) {
-        return boardDao.selectPostByPostId(bIdx);
+        BoardResponse test = boardMapper.selectPostByPostId(bIdx);
+//        return boardDao.selectPostByPostId(bIdx);
+        return test;
     }
 
     public BoardInfoResponse selectPostsByPostId(Integer bIdx) {
-        FileRequest file = fileDao.selectFileByBoardId(bIdx);
+//        FileRequest file = fileDao.selectFileByBoardId(bIdx);
+        FileRequest file = fileMapper.selectFileByBoardId(bIdx);
         FileResponse fileResponse;
         if (file == null) fileResponse = null;
         else fileResponse = new FileResponse(file.getFileNo(), file.getFileName(), file.getPath());
-        return new BoardInfoResponse(boardDao.selectPostNByPostId(bIdx), fileResponse, commentService.selectCommentsByPostId(bIdx));
+//        return new BoardInfoResponse(boardDao.selectPostNByPostId(bIdx), fileResponse, commentService.selectCommentsByPostId(bIdx));
+        return new BoardInfoResponse(boardMapper.selectPostNByPostId(bIdx), fileResponse, commentService.selectCommentsByPostId(bIdx));
     }
 
     public List<BoardResponse> selectPostAndCommentByPostId(Integer bIdx) {
@@ -96,8 +104,8 @@ public class BoardService {
 
         if (userSession != null) {
             Paging paging = new Paging();
-            paging.setPaging(page, size, blockSize, boardDao.getTotalCnt());
-            return boardDao.selectPostByUserId(paging, userSession.getIdx());
+            paging.setPaging(page, size, blockSize, boardMapper.getTotalCnt());
+            return boardMapper.selectPostByUserId(paging, userSession.getIdx());
         } else {
             System.out.println("로그인을 먼저 해주세요.");
             return null;
@@ -106,12 +114,12 @@ public class BoardService {
 
     public String updatePost(Integer bIdx, BoardRequest boardRequest, HttpServletRequest request) {
         UserSession userSession = userService.getLoginUserInfo(request);
-        Integer b_uidx = boardDao.selectPostByPostId(bIdx).getUserIdx();
+        Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
 
         if (userSession != null ) {
             if (b_uidx.equals(userSession.getIdx())) {
                 BoardUpdateRequest boardUpdateRequest = new BoardUpdateRequest(bIdx, boardRequest.getTitle(), boardRequest.getContent(), new Timestamp(new Date().getTime()));
-                boardDao.updatePost(boardUpdateRequest);
+                boardMapper.updatePost(boardUpdateRequest);
                 return "게시물 수정 완료";
             } else {
                 System.out.println("본인 게시물만 삭제 가능");
@@ -125,11 +133,11 @@ public class BoardService {
     public String deletePost(Integer bIdx, HttpServletRequest request) {
 
         UserSession userSession = userService.getLoginUserInfo(request);
-        Integer b_uidx = boardDao.selectPostByPostId(bIdx).getUserIdx();
+        Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
 
         if (userSession != null ) {
             if (b_uidx.equals(userSession.getIdx())) {
-                boardDao.deletePost(bIdx);
+                boardMapper.deletePost(bIdx);
                 return "게시물 삭제 완료";
             } else {
                 System.out.println("본인 게시물만 삭제 가능");
@@ -141,7 +149,7 @@ public class BoardService {
     }
 
     public BoardResponse searchPosts(String q) {
-        return boardDao.searchPosts(q);
+        return boardMapper.searchPosts(q);
     }
 
     // 제목 검색 like 0%0

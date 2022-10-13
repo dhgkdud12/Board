@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+    <mapper namespace="spring.board.dao.MyBatis.FileMapper">
+        <insert id="insertFile" parameterType="spring.board.entity.FileEntity">
+            INSERT INTO file (board_no, file_name, convert_name, path, extension, size)
+            values (#{boardNo}, #{fileName}, #{convertName}, #{path}, #{extension}, #{size})
+        </insert>
+        <select id="selectFile" parameterType="Integer" resultType="spring.board.dto.FileRequest">
+            SELECT * FROM file WHERE file_no = #{fileNo}
+        </select>
+        <select id="selectFileByBoardId" parameterType="Integer" resultType="spring.board.dto.FileRequest">
+                SELECT * FROM file WHERE board_no = #{boardNo}
+        </select>
+    </mapper>

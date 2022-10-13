@@ -24,6 +24,7 @@ public class JdbcCommentDao {
 //        Integer groupNo = comment.getGroupNo();
         Integer groupOrd = comment.getGroupOrd();
 
+        // parentId, groupNo
         if (comment.getParentId() == null) { // 루트 댓글일 때
             Integer groupNo = jdbcTemplate.queryForObject(
                     "select IFNULL(max(group_no),0)+1 " +
@@ -32,6 +33,7 @@ public class JdbcCommentDao {
                     Integer.class);
             comment.setGroupNo(groupNo);
         } else { // 대댓글일 때, 부모 댓글이 존재할 때
+            // parentId, groupNo, groupOrd, layer
             String query = "SELECT comment_no, board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord " +
                             "from comment " +
                             "where comment_no = ?";

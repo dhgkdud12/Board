@@ -11,7 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import spring.board.dao.JdbcTemplate.JdbcFileDao;
+import spring.board.dao.MyBatis.FileMapper;
 import spring.board.dto.BoardRequest;
 import spring.board.dto.FileRequest;
 import spring.board.entity.FileEntity;
@@ -28,11 +28,18 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class FileService {
 
-    private final JdbcFileDao fileDao;
+//    private final JdbcFileDao fileDao;
 
-    public FileService(JdbcFileDao fileDao) {
-        this.fileDao = fileDao;
+//    public FileService(JdbcFileDao fileDao) {
+//        this.fileDao = fileDao;
+//    }
+
+    private final FileMapper fileMapper;
+
+    public FileService(FileMapper fileMapper) {
+        this.fileMapper = fileMapper;
     }
+
 
     public String uploadFile(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
 
@@ -62,7 +69,8 @@ public class FileService {
         System.out.println(fullPath);
 
         FileEntity file = new FileEntity(null, bIdx, onlyFName, convertName, filePath, fileE, fileSize);
-        if (fileDao.insertFile(file) == 1) return "파일 업로드 완료";
+//        if (fileDao.insertFile(file) == 1) return "파일 업로드 완료";
+        if (fileMapper.insertFile(file) == 1) return "파일 업로드 완료";
         else return "파일 업로드 실패";
 
 
@@ -133,7 +141,8 @@ public class FileService {
         System.out.println(fileSize);
 
         FileEntity fileEntity = new FileEntity(null, bIdx, onlyFName, convertName, filePath, fileE, fileSize);
-        if (fileDao.insertFile(fileEntity) == 1) return "파일 업로드 완료";
+//        if (fileDao.insertFile(fileEntity) == 1) return "파일 업로드 완료";
+        if (fileMapper.insertFile(fileEntity) == 1) return "파일 업로드 완료";
         else return "파일 업로드 실패";
 
 
@@ -153,7 +162,8 @@ public class FileService {
         HttpHeaders headers = new HttpHeaders();
         Resource resource = null;
 
-        FileRequest g_file = fileDao.selectFile(fIdx);
+//        FileRequest g_file = fileDao.selectFile(fIdx);
+        FileRequest g_file = fileMapper.selectFile(fIdx);
         String path = g_file.getPath(); // 파일 경로 얻기
 
         FTPClient ftpClient = new FTPClient();
@@ -199,7 +209,8 @@ public class FileService {
     }
 
     public ResponseEntity<Object> downloadFile(Integer fIdx) {
-        FileRequest g_file = fileDao.selectFile(fIdx);
+//        FileRequest g_file = fileDao.selectFile(fIdx);
+        FileRequest g_file = fileMapper.selectFile(fIdx);
 
         String path = g_file.getPath()+g_file.getConvertName()+"."+g_file.getExtension(); // 파일 경로 얻기
 

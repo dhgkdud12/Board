@@ -8,9 +8,8 @@ import java.util.List;
 
 @Mapper
 public interface CommentMapper {
+    public void insertRootComment(Comment comment);
     public void insertComment(Comment comment);
-    public Integer selectGroupNoNotParent(Integer parentId);
-    public Integer selectGroupNo(Integer parentId);
 
     public List<CommentResponse> selectCommentsByPostId(Integer bIdx);
 
