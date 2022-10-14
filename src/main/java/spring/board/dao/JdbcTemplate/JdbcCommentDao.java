@@ -27,46 +27,47 @@ public class JdbcCommentDao {
         // parentId, groupNo
         if (comment.getParentId() == null) { // 루트 댓글일 때
             Integer groupNo = jdbcTemplate.queryForObject(
-                    "select IFNULL(max(group_no),0)+1 " +
-                    "from comment " +
-                    "where parent_id IS null;",
+                    "SELECT IFNULL(max(group_no),0)+1 " +
+                    "FROM comment " +
+                    "WHERE parent_id IS null;",
                     Integer.class);
             comment.setGroupNo(groupNo);
         } else { // 대댓글일 때, 부모 댓글이 존재할 때
             // parentId, groupNo, groupOrd, layer
             String query = "SELECT comment_no, board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord " +
-                            "from comment " +
-                            "where comment_no = ?";
+                            "FROM comment " +
+                            "WHERE comment_no = ?";
             Comment parentCo = jdbcTemplate.queryForObject(query, new JdbcCommentDao.CommentRowMapper(), comment.getParentId());
             comment.setGroupNo(parentCo.getGroupNo()); // 부모 댓글에 대한 group_no
             groupOrd = jdbcTemplate.queryForObject(
-                    "select  IFNULL(max(group_ord), 0)+1 " +
-                    "from comment " +
-                    "where parent_id = ?;",
+                    "SELECT  IFNULL(max(group_ord), 0)+1 " +
+                    "FROM comment " +
+                    "WHERE parent_id = ?;",
                     Integer.class, comment.getParentId());
             comment.setGroupOrd(groupOrd); // group 순서 + 1
             comment.setLayer(parentCo.getLayer()+1); // layer + 1
 
             // 부모 댓글 자식 수 +1
-            String prQuery = "UPDATE comment SET child_cnt = child_cnt + 1 WHERE comment_no = ?";
+            String prQuery = "UPDATE comment SET child_cnt = child_cnt + 1 " +
+                    "WHERE comment_no = ?";
             jdbcTemplate.update(prQuery, comment.getParentId());
         }
 
         // 댓글 등록
         String query = "INSERT INTO comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord ) " +
-                        "values (?, ?, ?, ?, ?, ?, ?, ?, ?)" ;
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)" ;
         jdbcTemplate.update(query, comment.getBoardNo(), comment.getContent(), comment.getUserIdx(), comment.getDate(), comment.getParentId(), comment.getGroupNo(), comment.getLayer(), comment.getChildCnt(), groupOrd);
     }
 
     // 게시물별 댓글 가져오기
     public List<CommentResponse> selectCommentsByPostId(Integer bIdx) {
-        String query = "" +
-                "select c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord " +
-                "from comment c " +
-                "inner join user u " +
-                "on c.user_idx = u.idx " +
-                "where c.board_no = ? " +
-                "order by comment_no";
+        String query = "SELECT" +
+                " c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord " +
+                "FROM comment c " +
+                "INNER JOIN user u " +
+                "ON c.user_idx = u.idx " +
+                "WHERE c.board_no = ? " +
+                "ORDER BY comment_no";
         try {
             return jdbcTemplate.query(query, new JdbcCommentDao.CommentAndNameRowMapper(), bIdx);
         } catch (EmptyResultDataAccessException e) {
@@ -79,7 +80,7 @@ public class JdbcCommentDao {
         String query = "SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord " +
                 "FROM comment c " +
                 "INNER JOIN user u " +
-                "on c.user_idx = u.idx " +
+                "ON c.user_idx = u.idx " +
                 "WHERE comment_no = ?";
         try {
             return jdbcTemplate.queryForObject(query, new JdbcCommentDao.CommentAndNameRowMapper(), id);

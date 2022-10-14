@@ -20,13 +20,15 @@ public class JdbcFileDao {
 
     // 파일 등록
     public int insertFile(FileEntity file){
-        String query = "INSERT INTO file (board_no, file_name, convert_name, path, extension, size) values (?, ?, ?, ?, ?, ?)" ;
+        String query = "INSERT INTO file (board_no, file_name, convert_name, path, extension, size) " +
+                "values (?, ?, ?, ?, ?, ?)" ;
         return jdbcTemplate.update(query, file.getBoardNo(), file.getFileName(), file.getConvertName(), file.getPath(), file.getExtension(), file.getSize());
     }
 
     // 파일 가져오기
     public FileRequest selectFile(Integer fIdx) {
-        String query = "SELECT * FROM file WHERE file_no = ?";
+        String query = "SELECT * FROM file " +
+                "WHERE file_no = ?";
         try {
             return jdbcTemplate.queryForObject(query, new JdbcFileDao.FileRowMapper(), fIdx);
         } catch (EmptyResultDataAccessException e) {
@@ -36,7 +38,8 @@ public class JdbcFileDao {
     
     // 게시물 id에 대한 파일 가져오기
     public FileRequest selectFileByBoardId(Integer bIdx) {
-        String query = "SELECT * FROM file WHERE board_no = ?";
+        String query = "SELECT * FROM file " +
+                "WHERE board_no = ?";
         try {
             return jdbcTemplate.queryForObject(query, new JdbcFileDao.FileRowMapper(), bIdx);
         } catch (Exception e) {

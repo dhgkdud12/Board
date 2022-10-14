@@ -5,10 +5,10 @@
 
     <mapper namespace="spring.board.dao.MyBatis.UserMapper">
         <select id="selectUser" parameterType="String" resultType="spring.board.entity.User">
-            select * from user where id = #{id}
+            SELECT * FROM user WHERE id = #{id}
         </select>
         <insert id="insertUser" parameterType="spring.board.dto.UserRequest">
-            insert into user(id, name, password, email)
-            values (#{id}, #{name}, #{password}, #{email})
+            INSERT INTO user(id, name, password, email)
+            VALUES (#{id}, #{name}, #{password}, #{email})
         </insert>
     </mapper>

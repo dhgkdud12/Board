@@ -10,33 +10,64 @@
     </insert>
 
     <select id="selectPostByPostId" parameterType="Integer" resultType="spring.board.dto.BoardResponse">
-        SELECT b.board_no, b.title, b.content, b.user_idx, u.user_name, b.create_date, b.update_date
+        SELECT b.board_no, b.title, b.content, b.user_idx, u.name AS user_name, b.create_date, b.update_date
         FROM board b
-            inner join user u
-                on b.user_idx = u.idx
+            INNER JOIN user u
+                ON b.user_idx = u.idx
         WHERE b.board_no = #{id}
     </select>
 
-    <select id="selectPostNByPostId" parameterType="Integer" resultType="spring.board.dto.BoardResponse">
-        SELECT b.board_no, b.title, b.content, b.user_idx, u.user_name, b.create_date, b.update_date
-        FROM board b
-                 inner join user u
-                            on b.user_idx = u.idx
-        WHERE b.board_no = #{id}
-    </select>
+<!--    <select id="selectPostNByPostId" parameterType="Integer" resultType="spring.board.dto.BoardResponse">-->
+<!--        SELECT b.board_no, b.title, b.content, b.user_idx, u.name as user_name, b.create_date, b.update_date-->
+<!--        FROM board b-->
+<!--                 INNER JOIN user u-->
+<!--                            ON b.user_idx = u.idx-->
+<!--        WHERE b.board_no = #{id}-->
+<!--    </select>-->
 
-    <select id="selectPostByUserId" parameterType="spring.board.entity.Paging" resultType="spring.board.dto.BoardResponse">
-        SELECT board_no, title, content, user_idx, user_name, create_date, update_date
+<!--책임님의 흔적-->
+<!--    허쉬초코샌드 ...-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+<!--    허쉬 초코샌드.-->
+
+    <select id="selectPostsByUserId" parameterType="hashmap" resultType="spring.board.dto.BoardResponse">
+        SELECT board_no, title, content, user_idx, name AS user_name, create_date, update_date
         FROM
             (SELECT ROW_NUMBER() OVER ( ORDER BY board_no ASC) AS row_num, board_no, title, content, user_idx, create_date, update_date
             FROM board WHERE user_idx = #{id}) b
                 INNER JOIN user u ON b.user_idx = u.idx
-        WHERE row_num BETWEEN ? AND ?
+        WHERE row_num BETWEEN #{startIndex} AND #{endIndex}
         ORDER BY row_num
     </select>
 
     <select id="getTotalCnt" resultType= "Integer">
-        select count(*) from board
+        SELECT count(*) FROM board
     </select>
 
     <resultMap id="boardMap" type="spring.board.dto.BoardResponse">
@@ -51,21 +82,23 @@
     </resultMap>
 
     <select id="selectPost" parameterType= "spring.board.entity.Paging" resultMap="boardMap">
-        SELECT b.board_no, b.title, b.content, b.user_idx, u.user_name, b.create_date, b.update_date
+        SELECT b.board_no, b.title, b.content, b.user_idx, u.name as user_name, b.create_date, b.update_date
 <!--        <if test="startIndex  null and startIndex   '' ">-->
 <!--             , create_date, update_date-->
 <!--        </if>-->
         FROM
             (SELECT ROW_NUMBER() OVER ( ORDER BY board_no ASC) AS row_num, board_no, title, content, user_idx, create_date, update_date
-             FROM board) b INNER JOIN user u ON b.user_idx = u.idx
+             FROM board) b
+                INNER JOIN user u
+                    ON b.user_idx = u.idx
         WHERE row_num BETWEEN #{startIndex} AND #{endIndex}
         ORDER BY row_num
     </select>
 
     <update id="updatePost" parameterType="spring.board.dto.BoardUpdateRequest">
         UPDATE board
-        SET title = #{title}, content = #{content}, update_date = #{updateDate}
-        where board_no = #{boardNo}
+        SET title = #{title}, content = #{content}, update_date = #{updateTime}
+        WHERE board_no = #{boardNo}
     </update>
 
     <delete id="deletePost" parameterType="Integer">

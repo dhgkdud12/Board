@@ -13,8 +13,7 @@ import java.util.List;
 public interface BoardMapper {
     public Integer insertPost(Board board);
     public BoardResponse selectPostByPostId(Integer id);
-    public BoardResponse selectPostNByPostId(Integer id);
-    public List<BoardResponse> selectPostByUserId(@Param("paging") Paging paging, @Param("id") Integer id);
+    public List<BoardResponse> selectPostsByUserId(int[] info);
     public Integer getTotalCnt();
     public List<BoardResponse> selectPost(Paging paging);
     public BoardResponse searchPosts(String q);

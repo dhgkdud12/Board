@@ -20,16 +20,16 @@ import java.util.Objects;
 public class CommentService {
     private final UserService userService;
     private final BoardMapper boardMapper;
+    private final CommentMapper commentMapper;
 //    private final JdbcBoardDao boardDao;
 //    private final JdbcCommentDao commentDao;
-    private final CommentMapper commentMapper;
 
     public CommentService(UserService userService, JdbcBoardDao boardDao, BoardMapper boardMapper, JdbcCommentDao commentDao, CommentMapper commentMapper) {
         this.userService = userService;
         this.boardMapper = boardMapper;
+        this.commentMapper = commentMapper;
 //        this.boardDao = boardDao;
 //        this.commentDao = commentDao;
-        this.commentMapper = commentMapper;
     }
 
     private CommentDto createCommentListDto(CommentResponse commentResponse) {
@@ -210,9 +210,6 @@ public class CommentService {
 
             return "댓글 작성 완료";
 
-//            if (commentDao.insertComment(comment) != 0) {
-//                System.out.println();
-//            }
         } else {
             System.out.println("로그인을 먼저 해주세요.");
         }

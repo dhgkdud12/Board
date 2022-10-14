@@ -62,6 +62,7 @@ public class BoardController {
     // 내가 작성한 게시물만 수정 가능
     @PutMapping("/{bIdx}")
     public String updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardRequest boardRequest, HttpServletRequest request) {
+        System.out.println(boardRequest.toString()); // -- ok
         return boardService.updatePost(bIdx, boardRequest, request);
     }
     
@@ -78,7 +79,7 @@ public class BoardController {
         return commentService.post(bIdx, commentRequest, request);
     }
 
-    @GetMapping("/{bIdx}/comment/{cIdx}")
+    @GetMapping("/{bIdx}/comment")
     public List<CommentDto> selectComment(@PathVariable("bIdx") Integer bIdx) {
         return commentService.selectCommentsByPostId(bIdx);
     }

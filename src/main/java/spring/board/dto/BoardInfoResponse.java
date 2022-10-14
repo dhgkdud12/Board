@@ -15,7 +15,5 @@ public class BoardInfoResponse {
     private BoardResponse boardResponse;
     private FileResponse fileResponse;
     private List<CommentDto> commentDtos;
-
-    // 페이지 정보?
 }
 

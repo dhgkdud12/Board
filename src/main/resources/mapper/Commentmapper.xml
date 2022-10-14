@@ -8,15 +8,15 @@
         <selectKey keyProperty="groupNo" resultType="Integer" order="BEFORE">
             SELECT MAX(group_no)+1 FROM comment WHERE parent_id IS NULL
         </selectKey>
-        insert into comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord)
+        INSERT INTO comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord)
         values (#{boardNo}, #{content}, #{userIdx}, #{date}, #{parentId}, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
     </insert>
 
     <insert id="insertComment" parameterType="spring.board.entity.Comment">
 -- 부모 검색해서 부모 값
         <selectKey keyProperty="groupNo,layer,groupOrd" resultType="spring.board.entity.Comment" order="BEFORE">
-            SELECT group_no as groupNo
-                   , layer+1 as layer,
+            SELECT group_no AS groupNo
+                   , layer+1 AS layer,
                    IFNULL(
                             (SELECT max(group_ord)+1
                              FROM comment
@@ -24,7 +24,7 @@
                                AND parent_id = #{parentId}
                                AND layer = ${layer}+1)
                        , 0) as groupOrd
-            FROM comment where comment_no = #{parentId} and board_no = #{boardNo}
+            FROM comment WHERE comment_no = #{parentId} AND board_no = #{boardNo}
         </selectKey>
 -- group_ord를 위한 값 계산해서 max+1
         INSERT INTO comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord)
@@ -47,15 +47,15 @@
     </resultMap>
 
     <select id="selectCommentsByPostId" parameterType="Integer" resultMap="commentMap">
-        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
+        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
         FROM comment c
                  INNER JOIN user u
-                            on c.user_idx = u.idx
+                            ON c.user_idx = u.idx
         WHERE comment_no = #{bIdx}
     </select>
 
     <select id="selectCommentByCommentId" parameterType="Integer" resultType="spring.board.dto.CommentResponse">
-        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
+        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
         FROM comment c
             INNER JOIN user u
                 on c.user_idx = u.idx
@@ -63,7 +63,7 @@
     </select>
 
     <select id="selectCommentByUserId" parameterType="Integer" resultType="Integer">
-        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
+        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
         FROM comment c
             INNER JOIN user u
                 ON c.user_idx = u.idx
@@ -76,7 +76,7 @@
     </delete>
 
     <select id="selectCommentsByUserId" resultMap="commentMap">
-        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
+        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
         FROM comment c
             INNER JOIN user u
                 ON c.user_idx = u.idx

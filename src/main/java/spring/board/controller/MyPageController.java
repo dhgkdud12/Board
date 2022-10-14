@@ -36,7 +36,7 @@ public class MyPageController {
             @RequestParam(name = "blockSize",  required = false, defaultValue = "10") int blockSize,
             HttpServletRequest request) {
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("boardInfo", boardService.selectAllPosts(page, size, blockSize));
+        resultMap.put("boardInfo", boardService.selectPostsByUserId(page, size, blockSize, request));
         resultMap.put("pageInfo", boardService.getPagingInfo(page, size, blockSize));
         return resultMap;
     }
