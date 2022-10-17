@@ -202,6 +202,7 @@ public class CommentService {
                     System.out.println("답글달 댓글이 존재하지 않음");
                     return "댓글 작성 실패";
                 }
+                // 부모 댓글이 해당 게시글의 댓글이 아닐 경우
                 comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), commentRequest.getParentId(), null, 0, 0, 0);
                 commentMapper.insertComment(comment);
             }
@@ -220,7 +221,7 @@ public class CommentService {
         UserSession userSession = userService.getLoginUserInfo(request);
         Integer c_uidx = commentMapper.selectCommentByCommentId(cIdx).getUserIdx();
 
-        if (c_uidx == null) System.out.println("게시물이 존재하지 않음");
+        if (c_uidx == null) System.out.println("댓글이 존재하지 않음");
         else if (userSession != null ) {
             if (c_uidx.equals(userSession.getIdx())) {
                 commentMapper.deleteComment(cIdx);

@@ -14,9 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 //@RequiredArgsConstructor
@@ -112,11 +110,11 @@ public class BoardService {
         if (userSession != null) {
             Paging paging = new Paging();
             paging.setPaging(page, size, blockSize, boardMapper.getTotalCnt());
-            int[] info = new int[3];
-            info[0] = paging.getStartIndex();
-            info[1] = paging.getEndIndex();
-            info[2] = userSession.getIdx();
-            List<BoardResponse> list = boardMapper.selectPostsByUserId(info);
+            Map<String, Integer> map = new HashMap();
+            map.put("startIndex", paging.getStartIndex());
+            map.put("endIndex", paging.getEndIndex());
+            map.put("id", userSession.getIdx());
+            List<BoardResponse> list = boardMapper.selectPostsByUserId(map);
             return list;
         } else {
             System.out.println("로그인을 먼저 해주세요.");

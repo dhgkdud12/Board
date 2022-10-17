@@ -13,7 +13,6 @@
     </insert>
 
     <insert id="insertComment" parameterType="spring.board.entity.Comment">
--- 부모 검색해서 부모 값
         <selectKey keyProperty="groupNo,layer,groupOrd" resultType="spring.board.entity.Comment" order="BEFORE">
             SELECT group_no AS groupNo
                    , layer+1 AS layer,
@@ -26,7 +25,7 @@
                        , 0) as groupOrd
             FROM comment WHERE comment_no = #{parentId} AND board_no = #{boardNo}
         </selectKey>
--- group_ord를 위한 값 계산해서 max+1
+
         INSERT INTO comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord)
         VALUES (#{boardNo}, #{content}, #{userIdx}, #{date}, #{parentId}, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
     </insert>
