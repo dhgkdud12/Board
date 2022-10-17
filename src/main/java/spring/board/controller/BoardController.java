@@ -3,7 +3,6 @@ package spring.board.controller;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import spring.board.dto.*;
-import spring.board.entity.Paging;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 import spring.board.service.UserService;
@@ -11,7 +10,6 @@ import spring.board.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +62,7 @@ public class BoardController {
     // 내가 작성한 게시물만 수정 가능
     @PutMapping("/{bIdx}")
     public String updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardRequest boardRequest, HttpServletRequest request) {
+        System.out.println(boardRequest.toString()); // -- ok
         return boardService.updatePost(bIdx, boardRequest, request);
     }
     
@@ -80,7 +79,7 @@ public class BoardController {
         return commentService.post(bIdx, commentRequest, request);
     }
 
-    @GetMapping("/{bIdx}/comment/{cIdx}")
+    @GetMapping("/{bIdx}/comment")
     public List<CommentDto> selectComment(@PathVariable("bIdx") Integer bIdx) {
         return commentService.selectCommentsByPostId(bIdx);
     }

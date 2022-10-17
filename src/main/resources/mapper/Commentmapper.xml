@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.board.dao.MyBatis.CommentMapper">
+    <insert id="insertRootComment" parameterType="spring.board.entity.Comment">
+        <selectKey keyProperty="groupNo" resultType="Integer" order="BEFORE">
+            SELECT MAX(group_no)+1 FROM comment WHERE parent_id IS NULL
+        </selectKey>
+        INSERT INTO comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord)
+        values (#{boardNo}, #{content}, #{userIdx}, #{date}, #{parentId}, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
+    </insert>
+
+    <insert id="insertComment" parameterType="spring.board.entity.Comment">
+        <selectKey keyProperty="groupNo,layer,groupOrd" resultType="spring.board.entity.Comment" order="BEFORE">
+            SELECT group_no AS groupNo
+                   , layer+1 AS layer,
+                   IFNULL(
+                            (SELECT max(group_ord)+1
+                             FROM comment
+                             WHERE board_no = #{boardNo}
+                               AND parent_id = #{parentId}
+                               AND layer = ${layer}+1)
+                       , 0) as groupOrd
+            FROM comment WHERE comment_no = #{parentId} AND board_no = #{boardNo}
+        </selectKey>
+
+        INSERT INTO comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord)
+        VALUES (#{boardNo}, #{content}, #{userIdx}, #{date}, #{parentId}, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
+    </insert>
+
+    <resultMap id="commentMap" type="spring.board.dto.CommentResponse">
+        <result column="comment_no" property="commentNo"></result>
+        <result column="board_no" property="boardNo"></result>
+        <result column="content" property="content"></result>
+        <result column="user_idx" property="userIdx"></result>
+        <result column="user_name" property="userName"></result>
+        <result column="date" property="date"></result>
+
+        <result column="parent_id" property="parentId"></result>
+        <result column="group_no" property="groupNo"></result>
+        <result column="layer" property="layer"></result>
+        <result column="child_cnt" property="childCnt"></result>
+        <result column="group_ord" property="groupOrd"></result>
+    </resultMap>
+
+    <select id="selectCommentsByPostId" parameterType="Integer" resultMap="commentMap">
+        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
+        FROM comment c
+                 INNER JOIN user u
+                            ON c.user_idx = u.idx
+        WHERE comment_no = #{bIdx}
+    </select>
+
+    <select id="selectCommentByCommentId" parameterType="Integer" resultType="spring.board.dto.CommentResponse">
+        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
+        FROM comment c
+            INNER JOIN user u
+                on c.user_idx = u.idx
+        WHERE comment_no = #{id}
+    </select>
+
+    <select id="selectCommentByUserId" parameterType="Integer" resultType="Integer">
+        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
+        FROM comment c
+            INNER JOIN user u
+                ON c.user_idx = u.idx
+        WHERE user_idx = #{id}
+          AND comment_no = #{uIdx}
+    </select>
+
+    <delete id="deleteComment" parameterType="Integer">
+        DELETE FROM comment WHERE comment_no = #{cIdx}
+    </delete>
+
+    <select id="selectCommentsByUserId" resultMap="commentMap">
+        SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
+        FROM comment c
+            INNER JOIN user u
+                ON c.user_idx = u.idx
+        WHERE c.user_idx = #{uIdx}
+        ORDER BY comment_no
+    </select>
+</mapper>

@@ -19,7 +19,8 @@ public class JdbcUserDao {
 
     // 사용자 등록
     public void insertUser(UserRequest userRequest){
-        String query = "INSERT INTO user (name, id, password, email) values (?, ?, ?, ?)" ;
+        String query = "INSERT INTO user (name, id, password, email) " +
+                "VALUES (?, ?, ?, ?)" ;
         jdbcTemplate.update(query, userRequest.getName(), userRequest.getId(), userRequest.getPassword(), userRequest.getEmail());
     }
 
