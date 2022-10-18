@@ -6,29 +6,32 @@
 <mapper namespace="spring.board.dao.MyBatis.CommentMapper">
     <insert id="insertRootComment" parameterType="spring.board.entity.Comment">
         <selectKey keyProperty="groupNo" resultType="Integer" order="BEFORE">
-            SELECT MAX(group_no)+1 FROM comment WHERE parent_id IS NULL
+            SELECT IFNULL(MAX(group_no), 0)+1 FROM comment WHERE parent_id IS NULL
         </selectKey>
         INSERT INTO comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord)
-        values (#{boardNo}, #{content}, #{userIdx}, #{date}, #{parentId}, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
+        values (#{boardNo}, #{content}, #{userIdx}, #{date}, 0, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
     </insert>
 
     <insert id="insertComment" parameterType="spring.board.entity.Comment">
         <selectKey keyProperty="groupNo,layer,groupOrd" resultType="spring.board.entity.Comment" order="BEFORE">
             SELECT group_no AS groupNo
                    , layer+1 AS layer,
-                   IFNULL(
-                            (SELECT max(group_ord)+1
+                            (SELECT IFNULL(max(group_ord)+1, 0)
                              FROM comment
-                             WHERE board_no = #{boardNo}
-                               AND parent_id = #{parentId}
-                               AND layer = ${layer}+1)
-                       , 0) as groupOrd
+                             WHERE parent_id = #{parentId}) as groupOrd
             FROM comment WHERE comment_no = #{parentId} AND board_no = #{boardNo}
         </selectKey>
+
+--         부모 댓글에 자식 수 +1 증가
 
         INSERT INTO comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord)
         VALUES (#{boardNo}, #{content}, #{userIdx}, #{date}, #{parentId}, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
     </insert>
+
+    <update id="updateParentChildCnt" parameterType="Integer">
+        UPDATE comment SET child_cnt = child_cnt + 1
+                       WHERE comment_no = #{parentId}
+    </update>
 
     <resultMap id="commentMap" type="spring.board.dto.CommentResponse">
         <result column="comment_no" property="commentNo"></result>
@@ -45,6 +48,7 @@
         <result column="group_ord" property="groupOrd"></result>
     </resultMap>
 
+<!-- 게시물에 대한 댓글 계층형으로 전달 -->
     <select id="selectCommentsByPostId" parameterType="Integer" resultMap="commentMap">
         SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
         FROM comment c
@@ -81,5 +85,27 @@
                 ON c.user_idx = u.idx
         WHERE c.user_idx = #{uIdx}
         ORDER BY comment_no
+    </select>
+
+    <select id="selectRecursiveComments" parameterType="int" resultMap="commentMap">
+        WITH RECURSIVE cte  AS (
+            SELECT comment_no, board_no, content, user_idx, date, IFNULL(parent_id. 0) as parent_id, group_no, layer, child_cnt, group_ord
+                 ,CONVERT(lpad (CONVERT(group_ord, CHAR(1)), 1, '0'), CHAR(100)) AS orders
+            FROM comment
+            WHERE board_no = #{bIdx}
+            AND parent_id = 0
+
+            UNION ALL
+            SELECT c.comment_no, c.board_no, c.content, c.user_idx, c.date, c.parent_id, c.group_no, c.layer, c.child_cnt, c.group_ord
+                 ,concat(p.orders, lpad(CONVERT(c.group_ord, CHAR(1)), 1, '0')) AS orders
+            FROM comment c
+                INNER JOIN cte p
+                    ON c.parent_id  = p.comment_no
+            WHERE c.board_no = #{bIdx}
+        )
+        SELECT c1.comment_no,c1.board_no,c1.content,c1.user_idx, u.name as user_name,c1.date,c1.parent_id,c1.group_no,c1.layer,c1.child_cnt,c1.group_ord
+        FROM cte c1
+        INNER JOIN  user u ON c1.user_idx = u.idx
+        ORDER BY group_no, orders, layer;
     </select>
 </mapper>

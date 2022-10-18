@@ -1,6 +1,7 @@
 package spring.board.dao.MyBatis;
 
 import org.apache.ibatis.annotations.Mapper;
+import spring.board.dto.CommentDto;
 import spring.board.dto.CommentResponse;
 import spring.board.entity.Comment;
 
@@ -9,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface CommentMapper {
     public void insertRootComment(Comment comment);
-    public void insertComment(Comment comment);
+    public Integer insertComment(Comment comment);
 
     public List<CommentResponse> selectCommentsByPostId(Integer bIdx);
 
@@ -20,4 +21,8 @@ public interface CommentMapper {
     public void deleteComment(Integer cIdx);
 
     public List<CommentResponse> selectCommentsByUserId(Integer uIdx);
+    public List<CommentResponse> selectRecursiveComments(Integer uIdx);
+
+
+    public void updateParentChildCnt(Integer parentId);
 }
