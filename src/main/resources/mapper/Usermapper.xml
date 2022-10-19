@@ -3,12 +3,17 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-    <mapper namespace="spring.board.dao.MyBatis.UserMapper">
-        <select id="selectUser" parameterType="String" resultType="spring.board.entity.User">
-            SELECT * FROM user WHERE id = #{id}
-        </select>
-        <insert id="insertUser" parameterType="spring.board.dto.UserRequest">
-            INSERT INTO user(id, name, password, email)
-            VALUES (#{id}, #{name}, #{password}, #{email})
-        </insert>
-    </mapper>
+<mapper namespace="spring.board.dao.MyBatis.UserMapper">
+    <select id="selectUser" parameterType="String" resultType="spring.board.entity.User">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <select id="selectUserId" parameterType="String" resultType="Integer">
+        SELECT COUNT(*) FROM user WHERE id = #{id}
+    </select>
+
+    <insert id="insertUser" parameterType="spring.board.dto.UserRequest">
+        INSERT INTO user(id, name, password, email)
+        VALUES (#{id}, #{name}, #{password}, #{email})
+    </insert>
+</mapper>

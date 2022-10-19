@@ -11,10 +11,7 @@ import spring.board.entity.Comment;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class CommentService {
@@ -76,10 +73,6 @@ public class CommentService {
 //                    }
 //                }
 //
-////                for (int j = 0; j < commentDtos.size(); j++) {
-////                    System.out.println(commentDtos.get(j).getCommentNo() + " " + commentDtos.get(j).getContent());
-////                }
-//
 //                for (int j = 0; j < commentDtos.size() ; j++) { // 댓글1의 댓글1의 댓글1, 댓글1의 댓글1의 댓글2
 //                    commentDto.getCommentDtos().add(commentDtos.get(j));
 //                    recursiveComment(commentList, layer+1, commentDtos.get(j).getCommentNo(), commentDto.getCommentDtos().get(j)); // 마지막 거 반환
@@ -113,77 +106,176 @@ public class CommentService {
 //                    recursiveComment(commentList, 2, commentDtos.get(j).getCommentNo(), commentDto.getCommentDtos().get(j)); // 마지막 거 반환
 //                }
 //
-//
 //                resultCommentList.add(commentDto);
-//
 //            }
 //        }
-//
 //        return resultCommentList;
 //    }
 
-    private List<CommentDto> recursiveComment (List<CommentResponse> list, Integer parentId, Integer layer) {
-        // stream - lamda
-//        List<CommentDto> childList = list.stream()
-//                .filter(r-> Objects.equals(r.getLayer(), layer))
-//                .filter(r-> Objects.equals(r.getParentId(), parentId))
-//                .map(this::createCommentListDto)
-//                .collect(Collectors.toList()); // 리스트로 변환
-//        childList.forEach(r-> {
-//            r.setCommentDtos(recursiveComment(list, r.getCommentNo(), layer+1));
-//        });
+//    private List<CommentDto> recursiveComment (List<CommentResponse> groupList, Integer parentId, Integer layer) { // groupList, 부모 id, layer
+//
+//        // stream - lamda
+////        List<CommentDto> childList = list.stream()
+////                .filter(r-> Objects.equals(r.getLayer(), layer))
+////                .filter(r-> Objects.equals(r.getParentId(), parentId))
+////                .map(this::createCommentListDto)
+////                .collect(Collectors.toList()); // 리스트로 변환
+////        childList.forEach(r-> {
+////            r.setCommentDtos(recursiveComment(list, r.getCommentNo(), layer+1));
+////        });
+//
+//        //foreach
+//        List<CommentDto> childList = new ArrayList<>();
+//        for (CommentResponse r : groupList) { // 자식 후보
+//            if (Objects.equals(r.getLayer(), layer)  // layer+1 값과 같다면 자식계층
+//                    && Objects.equals(r.getParentId(), parentId)) { // parentId값이 부모의 comment_no와 같다면
+//                childList.add(createCommentListDto(r)); // list에 추가
+//            }
+//        }
+//        for (CommentDto r : childList) { // 자식으로 묶은 댓글들의 하위 댓글을 찾기위해
+//            r.setCommentDtos(recursiveComment(groupList, r.getCommentNo(), layer+1)); // groupList 그대로, CommentNo값, layer+1
+//        }
+//        return childList;
+//    }
 
-        //foreach
-        List<CommentDto> childList = new ArrayList<>();
-        for (CommentResponse r : list) {
-            if (Objects.equals(r.getLayer(), layer) && Objects.equals(r.getParentId(), parentId)) {
-                childList.add(createCommentListDto(r));
-            }
-        }
-        for (CommentDto r : childList) {
-            r.setCommentDtos(recursiveComment(list, r.getCommentNo(), layer+1));
-        }
-        return childList;
-    }
+//    public List<CommentDto> selectCommentsByPostId(Integer bIdx) {
+//        List<CommentResponse> commentList = commentMapper.selectCommentsByPostId(bIdx); // 전체 댓글 조회
+//        List<CommentDto> respList = new ArrayList<>(); // 결과리스트
+//        for (CommentResponse comment : commentList) {
+//            if (comment.getLayer() == 0) { // 계층이 0인 루트댓글(최상위 댓글)만
+//                int groupNo = comment.getGroupNo();
+//                // stream
+////                List<CommentResponse> groupList = commentList.stream()
+////                        .filter(r->r.getGroupNo() == groupNo)
+////                        .collect(Collectors.toList());
+//
+//                //foreach
+//                List<CommentResponse> groupList = new ArrayList<>();
+//                for (CommentResponse r : commentList) {
+//                    if (r.getGroupNo() == groupNo) { // group_no가 같은 (댓글 1, 댓글 2에 대한 것들) 것들을 list에 다 담아 그룹 별로 분리
+//                        groupList.add(r);
+//                    }
+//                }
+//                CommentDto rootComment = createCommentListDto(comment);
+//                rootComment.setCommentDtos(recursiveComment(groupList, rootComment.getCommentNo(), rootComment.getLayer() + 1));
+//                respList.add(rootComment);
+//            }
+//        }
+//        return respList;
+//    }
 
 
-        public List<CommentDto> selectCommentsByPostId(Integer bIdx) {
-        List<CommentResponse> commentList = commentMapper.selectCommentsByPostId(bIdx); // 전체 댓글 조회
-        List<CommentDto> respList = new ArrayList<>(); // 결과리스트 
-        for (CommentResponse comment : commentList) {
-            if (comment.getLayer() == 0) {
-                int groupNo = comment.getGroupNo();
-                // stream
-//                List<CommentResponse> groupList = commentList.stream()
-//                        .filter(r->r.getGroupNo() == groupNo)
-//                        .collect(Collectors.toList());
+//    private List<CommentDto> addCommentList(List<CommentDto> parent, List<CommentDto> child) {
+//        for (int i = 0; i < parent.size(); i++) {
+//            Integer commentId = parent.get(i).getCommentNo();
+//            for (int j = 0; j < child.size(); j++) {
+//                Integer parentId = child.get(j).getParentId();
+//                if (commentId == parentId) {
+//                    parent.get(i).getCommentDtos().add(child.get(j));
+//                }
+//            }
+//        }
+//        return parent;
+//    }
 
-                //foreach
-                List<CommentResponse> groupList = new ArrayList<>();
-                for (CommentResponse r : commentList) {
-                    if (r.getGroupNo() == groupNo) {
-                        groupList.add(r);
+//    private List<CommentDto> recursiveComment (List<CommentDto> groupList, Integer parentId, Integer layer, Integer childCnt) {
+//
+//        List<CommentDto> childList = new ArrayList<>();
+//        for (CommentDto r : groupList) {
+//            if (Objects.equals(r.getLayer(), layer) && Objects.equals(r.getParentId(), parentId)) {
+//                childList.add(r);
+//            }
+//        }
+//        for (CommentDto r : childList) {
+//            r.setCommentDtos(recursiveComment(groupList, r.getCommentNo(), layer+1, r.getChildCnt()));
+//        }
+//        return childList;
+//    }
+
+    public List<CommentDto> selectCommentsByPostId(Integer bIdx) {
+        List<CommentResponse> orderedComments = commentMapper.selectRecursiveComments(bIdx);
+
+        List<CommentDto> respList = new ArrayList<>();
+
+        for (CommentResponse comment : orderedComments) {
+            if (comment.getParentId() == 0) {
+                List<CommentDto> groupList = new ArrayList<>();
+                CommentDto rootComment = createCommentListDto(comment); // 최상위 댓글
+
+                for(CommentResponse c : orderedComments) {
+                    if (comment.getGroupNo() == c.getGroupNo()) {
+                        groupList.add(createCommentListDto(c));
                     }
                 }
-                CommentDto rootComment = createCommentListDto(comment);
-                rootComment.setCommentDtos(recursiveComment(groupList, rootComment.getCommentNo(), rootComment.getLayer() + 1));
+
+                rootComment.setCommentDtos(recursiveComment(groupList, rootComment.getCommentNo(), rootComment.getLayer()+1, rootComment.getChildCnt()));
                 respList.add(rootComment);
             }
         }
         return respList;
     }
 
-    private List<CommentDto> addCommentList(List<CommentDto> parent, List<CommentDto> child) {
-        for (int i = 0; i < parent.size(); i++) {
-            Integer commentId = parent.get(i).getCommentNo();
-            for (int j = 0; j < child.size(); j++) {
-                Integer parentId = child.get(j).getParentId();
-                if (commentId == parentId) {
-                    parent.get(i).getCommentDtos().add(child.get(j));
-                }
+//    public List<CommentDto> selectCommentsByPostId(Integer bIdx) {
+//        List<CommentResponse> orderedComments = commentMapper.selectRecursiveComments(bIdx);
+//
+//        List<CommentDto> respList = new ArrayList<>();
+//
+//        for (CommentResponse comment : orderedComments) {
+//            if (comment.getParentId() == 0) {
+//                List<CommentDto> groupList = new ArrayList<>();
+//                CommentDto rootComment = createCommentListDto(comment); // 최상위 댓글
+//
+//                for(CommentResponse c : orderedComments) {
+//                    if (comment.getGroupNo() == c.getGroupNo()) {
+//                        groupList.add(createCommentListDto(c));
+//                    }
+//                }
+//
+//                List<CommentDto> commentDtos = new ArrayList<>();
+//                List<CommentDto> commentDtos2 = new ArrayList<>();
+//
+//                commentDtos.add(groupList.get(1));
+//
+//                if (groupList.get(1).getChildCnt() > 0) {
+//
+//                    for (int i = 0; i < groupList.get(1).getChildCnt(); i++) {
+//                        commentDtos2.add(groupList.get(2 + i));
+//                    }
+//
+//                }
+//
+//                if (groupList.get(0).getChildCnt() > 0) {
+//                    for (int i = 0; i < groupList.get(0).getChildCnt() - 1 ; i++) {
+//                        commentDtos.add(groupList.get(5+i));
+//                    }
+//                }
+//
+//                if (groupList.size()>1) {
+//                    groupList.get(1).setCommentDtos(commentDtos2);
+//                }
+//                groupList.get(0).setCommentDtos(commentDtos);
+//
+//                respList.add(groupList.get(0));
+//            }
+//
+//        }
+//
+//        return respList;
+//    }
+
+    private List<CommentDto> recursiveComment (List<CommentDto> groupList, Integer parentId, Integer layer, Integer childCnt) {
+
+        //
+        List<CommentDto> childList = new ArrayList<>();
+        for (CommentDto r : groupList) {
+            if (Objects.equals(r.getLayer(), layer) && Objects.equals(r.getParentId(), parentId)) {
+                childList.add(r);
             }
         }
-        return parent;
+        for (CommentDto r : childList) {
+            r.setCommentDtos(recursiveComment(groupList, r.getCommentNo(), layer+1, r.getChildCnt()));
+        }
+        return childList;
     }
 
     public String post(Integer bIdx, CommentRequest commentRequest, HttpServletRequest request) {
@@ -205,6 +297,8 @@ public class CommentService {
                 // 부모 댓글이 해당 게시글의 댓글이 아닐 경우
                 comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), commentRequest.getParentId(), null, 0, 0, 0);
                 commentMapper.insertComment(comment);
+                commentMapper.updateParentChildCnt(comment.getParentId());
+
             }
 //            comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), commentRequest.getParentId(), null, 0, 0, 0);
 //            jdbcCommentDao.insertComment(comment);
@@ -217,6 +311,7 @@ public class CommentService {
         return "댓글 작성 실패";
     }
 
+    // 댓글 삭제시 삭제된 댓글입니다로 변경
     public String delete(Integer cIdx, HttpServletRequest request) { // 글이 존재하지 않을 경우
         UserSession userSession = userService.getLoginUserInfo(request);
         Integer c_uidx = commentMapper.selectCommentByCommentId(cIdx).getUserIdx();
@@ -230,7 +325,7 @@ public class CommentService {
                 System.out.println("본인 댓글만 삭제 가능");
             }
         } else {
-            System.out.println("로그인 후 댓글 작성 가능");
+            System.out.println("로그인 후 본인 댓글만 작성 가능");
         }
         return "댓글 삭제 실패";
     }

@@ -9,5 +9,6 @@ import spring.board.entity.User;
 @Mapper
 public interface UserMapper {
     User selectUser(String id);
+    Integer selectUserId(String id);
     void insertUser(UserRequest userRequest);
 }
