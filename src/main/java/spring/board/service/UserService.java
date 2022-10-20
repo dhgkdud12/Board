@@ -26,6 +26,9 @@ public class UserService {
 
 
     public String register(UserRequest userRequest) {
+        if (userMapper.selectUserId(userRequest.getId()) == 1) {
+            return "이미 해당 ID가 존재";
+        }
         String hashPassword = BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt());
         userRequest.setPassword(hashPassword);
 //        userDao.insertUser(userRequest);
