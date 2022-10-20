@@ -6,7 +6,7 @@ import spring.board.dao.MyBatis.UserMapper;
 import spring.board.dto.UserLoginRequest;
 import spring.board.dto.UserRequest;
 import spring.board.dto.UserSession;
-import spring.board.entity.User;
+import spring.board.domain.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
