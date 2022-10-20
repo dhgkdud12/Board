@@ -89,7 +89,7 @@
 
     <select id="selectRecursiveComments" parameterType="int" resultMap="commentMap">
         WITH RECURSIVE cte  AS (
-            SELECT comment_no, board_no, content, user_idx, date, IFNULL(parent_id. 0) as parent_id, group_no, layer, child_cnt, group_ord
+            SELECT comment_no, board_no, content, user_idx, date, IFNULL(parent_id,0) as parent_id, group_no, layer, child_cnt, group_ord
                  ,CONVERT(lpad (CONVERT(group_ord, CHAR(1)), 1, '0'), CHAR(100)) AS orders
             FROM comment
             WHERE board_no = #{bIdx}
