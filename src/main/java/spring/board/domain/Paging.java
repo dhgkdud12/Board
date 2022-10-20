@@ -1,4 +1,4 @@
-package spring.board.entity;
+package spring.board.domain;
 
 import lombok.Getter;
 

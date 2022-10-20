@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import spring.board.dto.UserRequest;
-import spring.board.entity.User;
+import spring.board.domain.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 

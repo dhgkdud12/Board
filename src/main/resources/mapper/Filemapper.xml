@@ -4,16 +4,14 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
     <mapper namespace="spring.board.dao.MyBatis.FileMapper">
-        <insert id="insertFile" parameterType="spring.board.entity.FileEntity">
+        <insert id="insertFile" parameterType="spring.board.domain.FileEntity">
             INSERT INTO file (board_no, file_name, convert_name, path, extension, size)
             VALUES (#{boardNo}, #{fileName}, #{convertName}, #{path}, #{extension}, #{size})
         </insert>
         <select id="selectFile" parameterType="Integer" resultType="spring.board.dto.FileRequest">
-            SELECT * FROM file
-                     WHERE file_no = #{fileNo}
+            SELECT * FROM file WHERE file_no = #{fileNo}
         </select>
         <select id="selectFileByBoardId" parameterType="Integer" resultType="spring.board.dto.FileRequest">
-                SELECT * FROM file
-                         WHERE board_no = #{boardNo}
+                SELECT * FROM file WHERE board_no = #{boardNo}
         </select>
     </mapper>

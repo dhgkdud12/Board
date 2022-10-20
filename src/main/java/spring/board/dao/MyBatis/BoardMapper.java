@@ -3,8 +3,8 @@ package spring.board.dao.MyBatis;
 import org.apache.ibatis.annotations.Mapper;
 import spring.board.dto.BoardResponse;
 import spring.board.dto.BoardUpdateRequest;
-import spring.board.entity.Board;
-import spring.board.entity.Paging;
+import spring.board.domain.Board;
+import spring.board.domain.Paging;
 
 import java.util.List;
 import java.util.Map;

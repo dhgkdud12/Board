@@ -7,8 +7,8 @@ import spring.board.dao.JdbcTemplate.JdbcFileDao;
 import spring.board.dao.MyBatis.BoardMapper;
 import spring.board.dao.MyBatis.FileMapper;
 import spring.board.dto.*;
-import spring.board.entity.Board;
-import spring.board.entity.Paging;
+import spring.board.domain.Board;
+import spring.board.domain.Paging;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -48,16 +48,21 @@ public class BoardService {
         if (userSession != null) {
             Board board = new Board(null, boardRequest.getTitle(), boardRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), null);
 //            int bIdx = boardDao.insertPost(board);
-            int bIdx = boardMapper.insertPost(board);
-            if (boardRequest.getFile() != null) {
-                boardRequest.setId(bIdx);
-                fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
-                return "게시물 작성 완료";
+            Integer bIdx = boardMapper.insertPost(board);
+
+            if (bIdx == null) {
+                return "게시물 작성 실패";
+            } else {
+                if (boardRequest.getFile() != null) {
+                    boardRequest.setId(bIdx);
+                    fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
+                }
             }
         } else {
             System.out.println("로그인을 먼저 해주세요.");
+            return "게시물 작성 실패";
         }
-        return "게시물 작성 실패";
+        return "게시물 작성 완료";
     }
 
     // 페이지
@@ -79,9 +84,8 @@ public class BoardService {
     }
 
     public BoardResponse selectPostByPostId(Integer bIdx) {
-        BoardResponse test = boardMapper.selectPostByPostId(bIdx);
-//        return boardDao.selectPostByPostId(bIdx);
-        return test;
+        BoardResponse boardResponse = boardMapper.selectPostByPostId(bIdx);
+        return boardResponse;
     }
 
     public BoardInfoResponse selectPostsByPostId(Integer bIdx) {
@@ -92,7 +96,11 @@ public class BoardService {
         else fileResponse = new FileResponse(file.getFileNo(), file.getFileName(), file.getPath());
 //        return new BoardInfoResponse(boardDao.selectPostNByPostId(bIdx), fileResponse, commentService.selectCommentsByPostId(bIdx));
 
-        BoardInfoResponse boardInfoResponse = new BoardInfoResponse(boardMapper.selectPostByPostId(bIdx), fileResponse, commentService.selectCommentsByPostId(bIdx));
+        BoardInfoResponse boardInfoResponse =
+                new BoardInfoResponse(
+                        boardMapper.selectPostByPostId(bIdx),
+                        fileResponse,
+                        commentService.selectCommentsByPostId(bIdx));
 
         return boardInfoResponse;
     }
@@ -110,7 +118,7 @@ public class BoardService {
         if (userSession != null) {
             Paging paging = new Paging();
             paging.setPaging(page, size, blockSize, boardMapper.getTotalCnt());
-            Map<String, Integer> map = new HashMap();
+            Map<String, Integer> map = new HashMap<>();
             map.put("startIndex", paging.getStartIndex());
             map.put("endIndex", paging.getEndIndex());
             map.put("id", userSession.getIdx());
@@ -129,8 +137,6 @@ public class BoardService {
         if (userSession != null ) {
             if (b_uidx.equals(userSession.getIdx())) {
                 BoardUpdateRequest boardUpdateRequest = new BoardUpdateRequest(bIdx, boardRequest.getTitle(), boardRequest.getContent(), new Timestamp(new Date().getTime()));
-                System.out.println("boardupdatetitle: "+boardRequest.getTitle());
-                System.out.println("boardupdatecontent: "+boardRequest.getContent());
                 boardMapper.updatePost(boardUpdateRequest);
                 return "게시물 수정 완료";
             } else {

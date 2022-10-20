@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import spring.board.dao.MyBatis.FileMapper;
 import spring.board.dto.BoardRequest;
 import spring.board.dto.FileRequest;
-import spring.board.entity.FileEntity;
+import spring.board.domain.FileEntity;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -158,7 +158,9 @@ public class FileService {
     }
 
     public ResponseEntity<Object> downloadFilefromFTP(Integer fIdx) {
-
+        
+        // 로그인했을 경우만 다운로드 가능
+        
         HttpHeaders headers = new HttpHeaders();
         Resource resource = null;
 
@@ -196,7 +198,6 @@ public class FileService {
                 resource = new InputStreamResource(inputStream); // 파일 resource 얻기
 
                 headers.setContentDisposition(ContentDisposition.builder("attachment").filename(g_file.getFileName()+"."+g_file.getExtension()).build());
-                System.out.println("파일 다운로드 성공");
                 ftpClient.disconnect(); // 연결 해제
 
                 f.delete();

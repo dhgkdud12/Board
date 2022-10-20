@@ -2,7 +2,7 @@ package spring.board.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import spring.board.entity.Paging;
+import spring.board.domain.Paging;
 
 @Getter
 @Setter

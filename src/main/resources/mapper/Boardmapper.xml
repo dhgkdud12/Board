@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="spring.board.dao.MyBatis.BoardMapper">
-    <insert id="insertPost" parameterType="spring.board.entity.Board">
+    <insert id="insertPost" parameterType="spring.board.domain.Board">
         INSERT INTO board (title, content, user_idx, create_date, update_date)
         VALUES (#{title}, #{content}, #{userIdx}, #{createDate}, #{updateDate})
     </insert>
@@ -43,7 +43,7 @@
 <!--        <collection property="boards" column="boardNo" javaType="java.util.List" ofType="spring.board.dto.BoardResponse" select="selectPost"> </collection>-->
     </resultMap>
 
-    <select id="selectPost" parameterType= "spring.board.entity.Paging" resultMap="boardMap">
+    <select id="selectPost" parameterType= "spring.board.domain.Paging" resultMap="boardMap">
         SELECT b.board_no, b.title, b.content, b.user_idx, u.name AS user_name, b.create_date, b.update_date
 <!--        <if test="startIndex  null and startIndex   '' ">-->
 <!--             , create_date, update_date-->

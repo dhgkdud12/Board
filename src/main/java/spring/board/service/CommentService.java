@@ -6,7 +6,7 @@ import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.MyBatis.BoardMapper;
 import spring.board.dao.MyBatis.CommentMapper;
 import spring.board.dto.*;
-import spring.board.entity.Comment;
+import spring.board.domain.Comment;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -194,7 +194,6 @@ public class CommentService {
 
     public List<CommentDto> selectCommentsByPostId(Integer bIdx) {
         List<CommentResponse> orderedComments = commentMapper.selectRecursiveComments(bIdx);
-
         List<CommentDto> respList = new ArrayList<>();
 
         for (CommentResponse comment : orderedComments) {
@@ -265,7 +264,6 @@ public class CommentService {
 
     private List<CommentDto> recursiveComment (List<CommentDto> groupList, Integer parentId, Integer layer, Integer childCnt) {
 
-        //
         List<CommentDto> childList = new ArrayList<>();
         for (CommentDto r : groupList) {
             if (Objects.equals(r.getLayer(), layer) && Objects.equals(r.getParentId(), parentId)) {

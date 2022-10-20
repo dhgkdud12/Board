@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import spring.board.dto.FileRequest;
-import spring.board.entity.FileEntity;
+import spring.board.domain.FileEntity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
