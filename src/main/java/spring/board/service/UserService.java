@@ -3,9 +3,9 @@ package spring.board.service;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import spring.board.dao.MyBatis.UserMapper;
-import spring.board.dto.UserLoginRequest;
-import spring.board.dto.UserRequest;
-import spring.board.dto.UserSession;
+import spring.board.dto.user.UserLoginRequest;
+import spring.board.dto.user.UserRequest;
+import spring.board.dto.user.UserSession;
 import spring.board.domain.User;
 
 import javax.servlet.http.HttpServletRequest;

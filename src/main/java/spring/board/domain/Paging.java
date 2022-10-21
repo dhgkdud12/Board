@@ -1,8 +1,12 @@
 package spring.board.domain;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.Map;
 
 @Getter
+@NoArgsConstructor
 public class Paging {
 
     /*
@@ -23,74 +27,25 @@ public class Paging {
     
     private int startPage = 1;
     private int endPage;
+
     private int startIndex = 0;
     private int endIndex;
+
     private int prevPage;
     private int nextPage;
 
     private int blockSize;
-    
     private int totalBlockCnt; // 총 블록 사이즈
 
-    public void setPaging(int page, int size, int blockSize, int totalCnt) { // 총 게시물수, 현재 페이지
-        setCurPage(page); // 현재 페이지
-        setPageSize(size);
-        setTotalCnt(totalCnt); // 총 게시물 수
-        setPageCnt(totalCnt); // 페이지수 계산
-        setEndPage(this.pageCnt);
-        setStartIndex(page); // startIdx
-        setEndIndex(page); // endIdx
-        setBlockSize(blockSize);
-        setTotalBlockCnt(this.pageCnt);
-    }
-
-    public void setPageSize(int pageSize) {
+    public Paging(int curPage, int pageSize, int blockSize, int totalCnt) {
         this.pageSize = pageSize;
-    }
-
-    public void setCurPage(int curPage) {
         this.curPage = curPage;
-    }
-
-    public void setTotalCnt(int totalCnt) {
         this.totalCnt = totalCnt;
-    }
-
-    public void setPageCnt(int totalCnt) { // 총 페이지수
         this.pageCnt = (int)Math.ceil(totalCnt/pageSize)+1;
-    }
-
-    public void setStartPage(int startPage) {
-        this.startPage = startPage;
-    }
-
-    public void setEndPage(int pageCnt) {
-        this.endPage = pageCnt;
-    }
-
-    public void setStartIndex(int curPage) {
+        this.endPage = this.pageCnt;
         this.startIndex = (curPage - 1) * pageSize;
-    }
-
-    public void setEndIndex(int curPage) {
         this.endIndex = curPage * pageSize;
-    }
-
-//    public void setPrevPage(int curPage) {
-//        if (curPage == 1) this.prevPage = 1;
-//        else this.prevPage = curPage - 1;
-//    }
-//
-//    public void setNextPage(int curPage) {
-//        if (curPage == endPage) this.nextPage = curPage;
-//        else this.nextPage = curPage + 1;
-//    }
-
-    public void setBlockSize(int blockSize) {
         this.blockSize = blockSize;
-    }
-
-    public void setTotalBlockCnt(int pageCnt) {
-        this.totalBlockCnt =  (int)Math.ceil(pageCnt/blockSize)+1;
+        this.totalBlockCnt =  (int)Math.ceil(this.pageCnt/blockSize)+1;
     }
 }

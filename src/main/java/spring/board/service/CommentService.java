@@ -5,8 +5,11 @@ import spring.board.dao.JdbcTemplate.JdbcBoardDao;
 import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.MyBatis.BoardMapper;
 import spring.board.dao.MyBatis.CommentMapper;
-import spring.board.dto.*;
 import spring.board.domain.Comment;
+import spring.board.dto.comment.CommentDto;
+import spring.board.dto.comment.CommentRequest;
+import spring.board.dto.comment.CommentResponse;
+import spring.board.dto.user.UserSession;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;

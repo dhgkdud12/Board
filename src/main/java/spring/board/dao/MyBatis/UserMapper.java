@@ -1,7 +1,7 @@
 package spring.board.dao.MyBatis;
 
 import org.apache.ibatis.annotations.Mapper;
-import spring.board.dto.UserRequest;
+import spring.board.dto.user.UserRequest;
 import spring.board.domain.User;
 
 // 매핑 파일에 정의된 SQL을 호출하는 인터페이스

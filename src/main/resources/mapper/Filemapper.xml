@@ -8,10 +8,10 @@
             INSERT INTO file (board_no, file_name, convert_name, path, extension, size)
             VALUES (#{boardNo}, #{fileName}, #{convertName}, #{path}, #{extension}, #{size})
         </insert>
-        <select id="selectFile" parameterType="Integer" resultType="spring.board.dto.FileRequest">
+        <select id="selectFile" parameterType="Integer" resultType="spring.board.dto.file.FileRequest">
             SELECT * FROM file WHERE file_no = #{fileNo}
         </select>
-        <select id="selectFileByBoardId" parameterType="Integer" resultType="spring.board.dto.FileRequest">
+        <select id="selectFileByBoardId" parameterType="Integer" resultType="spring.board.dto.file.FileRequest">
                 SELECT * FROM file WHERE board_no = #{boardNo}
         </select>
     </mapper>

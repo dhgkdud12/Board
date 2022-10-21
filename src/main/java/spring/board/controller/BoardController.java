@@ -4,7 +4,11 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import spring.board.domain.response.CommonResponse;
 import spring.board.domain.response.ResponseStatus;
-import spring.board.dto.*;
+import spring.board.dto.board.BoardInfoResponse;
+import spring.board.dto.board.BoardRequest;
+import spring.board.dto.comment.CommentDto;
+import spring.board.dto.comment.CommentRequest;
+import spring.board.dto.user.UserSession;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 import spring.board.service.UserService;
@@ -31,17 +35,21 @@ public class BoardController {
     // 홈화면
     @GetMapping("")
     public CommonResponse home(
-            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(name = "page", required = false, defaultValue = "1") int curPage,
             @RequestParam(name = "size", required = false, defaultValue = "10") int size,
             @RequestParam(name = "blockSize", required = false, defaultValue = "5") int blockSize,
+            @RequestParam(name = "searchType", required = false, defaultValue = "title") String searchType,
+            @RequestParam(name = "keyword", required = false) String keyword,
             HttpServletRequest request) {
         Map<String, Object> resultMap = new HashMap<>();
         UserSession userSession = userService.getLoginUserInfo(request);
         if (userSession != null) {
             System.out.println(userSession.getName()+"님 로그인중");
         }
-        resultMap.put("boardInfo", boardService.selectAllPosts(page, size, blockSize));
-        resultMap.put("pageInfo", boardService.getPagingInfo(page, size, blockSize));
+        
+        // search객체에 paging 상속받아서 search 넘겨줌
+        resultMap.put("boardInfo", boardService.selectAllPosts(curPage, size, blockSize));
+        resultMap.put("pageInfo", boardService.getPagingInfo(curPage, size, blockSize));
 
         return new CommonResponse<>(ResponseStatus.SUCCESS, "게시물 조회 성공", resultMap);
     }
@@ -96,4 +104,5 @@ public class BoardController {
         return new CommonResponse<>(ResponseStatus.SUCCESS, message, null
         );
     }
+
 }

@@ -6,9 +6,13 @@ import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.JdbcTemplate.JdbcFileDao;
 import spring.board.dao.MyBatis.BoardMapper;
 import spring.board.dao.MyBatis.FileMapper;
-import spring.board.dto.*;
 import spring.board.domain.Board;
 import spring.board.domain.Paging;
+import spring.board.dto.board.*;
+import spring.board.dto.common.PageInfo;
+import spring.board.dto.file.FileRequest;
+import spring.board.dto.file.FileResponse;
+import spring.board.dto.user.UserSession;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -66,19 +70,16 @@ public class BoardService {
     }
 
     // 페이지
-    public List<BoardResponse> selectAllPosts(int page, int size, int blockSize) {
-        Paging paging = new Paging();
-//        paging.setPaging(page, size, blockSize, boardDao.getTotalCnt());
+    public List<BoardResponse> selectAllPosts(int curPage, int pageSize, int blockSize) {
+        BoardSearchRequest search = new BoardSearchRequest(curPage, pageSize, blockSize, boardMapper.getTotalCnt());
 //        return boardDao.selectPost(paging);
-        paging.setPaging(page, size, blockSize, boardMapper.getTotalCnt());
-        List<BoardResponse> list = boardMapper.selectPost(paging);
+        List<BoardResponse> list = boardMapper.selectPost(search);
         return list;
     }
 
     public PageInfo getPagingInfo(int page, int size, int blockSize) {
-        Paging paging = new Paging();
+        Paging paging = new Paging(page, size, blockSize, boardMapper.getTotalCnt());
 //        paging.setPaging(page, size, blockSize, boardDao.getTotalCnt());
-        paging.setPaging(page, size, blockSize, boardMapper.getTotalCnt());
         PageInfo pageInfo = new PageInfo(paging);
         return pageInfo;
     }
@@ -116,8 +117,8 @@ public class BoardService {
         UserSession userSession = (UserSession) session.getAttribute("USER");
 
         if (userSession != null) {
-            Paging paging = new Paging();
-            paging.setPaging(page, size, blockSize, boardMapper.getTotalCnt());
+            Paging paging = new Paging(page, size, blockSize, boardMapper.getTotalCnt());
+//            paging.setPaging(page, size, blockSize, boardMapper.getTotalCnt());
             Map<String, Integer> map = new HashMap<>();
             map.put("startIndex", paging.getStartIndex());
             map.put("endIndex", paging.getEndIndex());

@@ -1,4 +1,4 @@
-package spring.board.dto;
+package spring.board.dto.board;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

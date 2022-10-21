@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import spring.board.domain.response.CommonResponse;
 import spring.board.domain.response.ResponseStatus;
-import spring.board.dto.CommentResponse;
+import spring.board.dto.comment.CommentResponse;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 
