@@ -70,8 +70,8 @@ public class BoardService {
     }
 
     // 페이지
-    public List<BoardResponse> selectAllPosts(int curPage, int pageSize, int blockSize) {
-        BoardSearchRequest search = new BoardSearchRequest(curPage, pageSize, blockSize, boardMapper.getTotalCnt());
+    public List<BoardResponse> selectAllPosts(String searchType, String keyword, int curPage, int pageSize, int blockSize) {
+        BoardSearchRequest search = new BoardSearchRequest(searchType, keyword, curPage, pageSize, blockSize, boardMapper.getTotalCnt());
 //        return boardDao.selectPost(paging);
         List<BoardResponse> list = boardMapper.selectPost(search);
         return list;
@@ -170,8 +170,4 @@ public class BoardService {
     public BoardResponse searchPosts(String q) {
         return boardMapper.searchPosts(q);
     }
-
-    // 제목 검색 like 0%0
-    // 내용 검색
-    // 작성자 검색
 }

@@ -48,7 +48,7 @@ public class BoardController {
         }
         
         // search객체에 paging 상속받아서 search 넘겨줌
-        resultMap.put("boardInfo", boardService.selectAllPosts(curPage, size, blockSize));
+        resultMap.put("boardInfo", boardService.selectAllPosts(searchType, keyword, curPage, size, blockSize));
         resultMap.put("pageInfo", boardService.getPagingInfo(curPage, size, blockSize));
 
         return new CommonResponse<>(ResponseStatus.SUCCESS, "게시물 조회 성공", resultMap);

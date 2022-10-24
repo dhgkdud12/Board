@@ -12,8 +12,8 @@ public class BoardSearchRequest extends Paging {
     private String keyword;
 
     public BoardSearchRequest(String searchType, String keyword, int curPage, int pageSize, int blockSize, int totalCnt) {
+        super(curPage, pageSize, blockSize, totalCnt);
         this.searchType = searchType;
         this.keyword = keyword;
-        super(curPage, pageSize, blockSize, totalCnt);
     }
 }
