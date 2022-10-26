@@ -2,6 +2,7 @@ package spring.board.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import spring.board.domain.User;
 import spring.board.domain.response.CommonResponse;
 import spring.board.domain.response.ResponseStatus;
 import spring.board.dto.board.BoardInfoResponse;
@@ -12,9 +13,9 @@ import spring.board.dto.user.UserSession;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 import spring.board.service.UserService;
+import spring.board.util.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +40,10 @@ public class BoardController {
             @RequestParam(name = "size", required = false, defaultValue = "10") int size,
             @RequestParam(name = "blockSize", required = false, defaultValue = "5") int blockSize,
             @RequestParam(name = "searchType", required = false, defaultValue = "title") String searchType,
-            @RequestParam(name = "keyword", required = false) String keyword,
-            HttpServletRequest request) {
+            @RequestParam(name = "keyword", required = false) String keyword) throws Exception {
         Map<String, Object> resultMap = new HashMap<>();
-        UserSession userSession = userService.getLoginUserInfo(request);
+//        UserSession userSession = userService.getLoginUserInfo(request);
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
         if (userSession != null) {
             System.out.println(userSession.getName()+"님 로그인중");
         }
@@ -55,9 +56,9 @@ public class BoardController {
     }
 
 
-    // 게시물 작성
+    // 게시물 작성 - 파일 업로드
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public CommonResponse post(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
+    public CommonResponse post(BoardRequest boardRequest, HttpServletRequest request) throws Exception {
         String message = boardService.post(boardRequest, request);
         return new CommonResponse<>(ResponseStatus.SUCCESS, message, null);
     }
@@ -72,23 +73,23 @@ public class BoardController {
     // 게시물 수정
     // 내가 작성한 게시물만 수정 가능
     @PutMapping("/{bIdx}")
-    public CommonResponse updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardRequest boardRequest, HttpServletRequest request) {
-        String message = boardService.updatePost(bIdx, boardRequest, request);
+    public CommonResponse updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardRequest boardRequest) throws Exception {
+        String message = boardService.updatePost(bIdx, boardRequest);
         return new CommonResponse<>(ResponseStatus.SUCCESS, message, null);
     }
     
     // 게시물 삭제
     // 내가 삭제한 게시물만 삭제 가능
     @DeleteMapping("/{bIdx}")
-    public CommonResponse deletePost(@PathVariable("bIdx")Integer bIdx, HttpServletRequest request) {
-        String message = boardService.deletePost(bIdx, request);
+    public CommonResponse deletePost(@PathVariable("bIdx")Integer bIdx) throws Exception {
+        String message = boardService.deletePost(bIdx);
         return new CommonResponse<>(ResponseStatus.SUCCESS, message, null);
     }
 
     // 댓글 작성
     @PostMapping("/{bIdx}")
-    public CommonResponse postComment(@PathVariable("bIdx") Integer bIdx, @RequestBody CommentRequest commentRequest, HttpServletRequest request) {
-        String message = commentService.post(bIdx, commentRequest, request);
+    public CommonResponse postComment(@PathVariable("bIdx") Integer bIdx, @RequestBody CommentRequest commentRequest) throws Exception {
+        String message = commentService.post(bIdx, commentRequest);
         return new CommonResponse<>(ResponseStatus.SUCCESS, message, null);
     }
 
@@ -99,8 +100,8 @@ public class BoardController {
     }
 
     @DeleteMapping("/{bIdx}/comment/{cIdx}")
-    public CommonResponse deleteComment(@PathVariable("bIdx") Integer bIdx, @PathVariable("cIdx") Integer cIdx, HttpServletRequest request) {
-        String message = commentService.delete(cIdx, request);
+    public CommonResponse deleteComment(@PathVariable("bIdx") Integer bIdx, @PathVariable("cIdx") Integer cIdx) throws Exception {
+        String message = commentService.delete(cIdx);
         return new CommonResponse<>(ResponseStatus.SUCCESS, message, null
         );
     }

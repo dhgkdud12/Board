@@ -20,6 +20,7 @@ public class FileController {
         this.fileService = fileService;
     }
 
+    // 파일 다운로드
     @GetMapping("/download/{fIdx}")
     public CommonResponse download(@PathVariable("fIdx") Integer fIdx) throws IOException {
         ResponseEntity<Object> entity = fileService.downloadFilefromFTP(fIdx);
