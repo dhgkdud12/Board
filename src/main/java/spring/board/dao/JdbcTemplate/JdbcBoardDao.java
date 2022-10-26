@@ -4,10 +4,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import spring.board.dto.BoardResponse;
-import spring.board.dto.BoardUpdateRequest;
-import spring.board.entity.Board;
-import spring.board.entity.Paging;
+import spring.board.dto.board.BoardResponse;
+import spring.board.dto.board.BoardUpdateRequest;
+import spring.board.domain.Board;
+import spring.board.domain.Paging;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

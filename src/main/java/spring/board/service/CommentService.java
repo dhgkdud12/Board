@@ -5,8 +5,12 @@ import spring.board.dao.JdbcTemplate.JdbcBoardDao;
 import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.MyBatis.BoardMapper;
 import spring.board.dao.MyBatis.CommentMapper;
-import spring.board.dto.*;
-import spring.board.entity.Comment;
+import spring.board.domain.Comment;
+import spring.board.dto.comment.CommentDto;
+import spring.board.dto.comment.CommentRequest;
+import spring.board.dto.comment.CommentResponse;
+import spring.board.dto.user.UserSession;
+import spring.board.util.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -15,14 +19,12 @@ import java.util.*;
 
 @Service
 public class CommentService {
-    private final UserService userService;
     private final BoardMapper boardMapper;
     private final CommentMapper commentMapper;
 //    private final JdbcBoardDao boardDao;
 //    private final JdbcCommentDao commentDao;
 
-    public CommentService(UserService userService, JdbcBoardDao boardDao, BoardMapper boardMapper, JdbcCommentDao commentDao, CommentMapper commentMapper) {
-        this.userService = userService;
+    public CommentService(BoardMapper boardMapper, CommentMapper commentMapper) {
         this.boardMapper = boardMapper;
         this.commentMapper = commentMapper;
 //        this.boardDao = boardDao;
@@ -194,7 +196,6 @@ public class CommentService {
 
     public List<CommentDto> selectCommentsByPostId(Integer bIdx) {
         List<CommentResponse> orderedComments = commentMapper.selectRecursiveComments(bIdx);
-
         List<CommentDto> respList = new ArrayList<>();
 
         for (CommentResponse comment : orderedComments) {
@@ -265,7 +266,6 @@ public class CommentService {
 
     private List<CommentDto> recursiveComment (List<CommentDto> groupList, Integer parentId, Integer layer, Integer childCnt) {
 
-        //
         List<CommentDto> childList = new ArrayList<>();
         for (CommentDto r : groupList) {
             if (Objects.equals(r.getLayer(), layer) && Objects.equals(r.getParentId(), parentId)) {
@@ -278,9 +278,10 @@ public class CommentService {
         return childList;
     }
 
-    public String post(Integer bIdx, CommentRequest commentRequest, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        UserSession userSession = (UserSession) session.getAttribute("USER");
+    public String post(Integer bIdx, CommentRequest commentRequest) throws Exception {
+//        HttpSession session = request.getSession();
+//        UserSession userSession = (UserSession) session.getAttribute("USER");
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
 
         if (boardMapper.selectPostByPostId(bIdx) == null) System.out.println("게시물이 존재하지 않음");
         else if (userSession != null) {
@@ -312,8 +313,9 @@ public class CommentService {
     }
 
     // 댓글 삭제시 삭제된 댓글입니다로 변경
-    public String delete(Integer cIdx, HttpServletRequest request) { // 글이 존재하지 않을 경우
-        UserSession userSession = userService.getLoginUserInfo(request);
+    public String delete(Integer cIdx) throws Exception { // 글이 존재하지 않을 경우
+//        UserSession userSession = userService.getLoginUserInfo(request);
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
         Integer c_uidx = commentMapper.selectCommentByCommentId(cIdx).getUserIdx();
 
         if (c_uidx == null) System.out.println("댓글이 존재하지 않음");
@@ -330,9 +332,10 @@ public class CommentService {
         return "댓글 삭제 실패";
     }
 
-    public List<CommentResponse> selectCommentsByUserId(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        UserSession userSession = (UserSession) session.getAttribute("USER");
+    public List<CommentResponse> selectCommentsByUserId() throws Exception {
+//        HttpSession session = request.getSession();
+//        UserSession userSession = (UserSession) session.getAttribute("USER");
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
         return commentMapper.selectCommentsByUserId(userSession.getIdx());
     }
 

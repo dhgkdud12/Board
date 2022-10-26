@@ -1,20 +1,18 @@
-package spring.board.dto;
+package spring.board.dto.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardRequest {
-    private int id;
-    private String title;
+public class CommentRequest {
+    // 부모 댓글 id
+    private Integer parentId;
     private String content;
-    private MultipartFile file;
 }
 

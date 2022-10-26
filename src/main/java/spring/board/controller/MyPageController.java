@@ -4,13 +4,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import spring.board.dto.BoardResponse;
-import spring.board.dto.CommentResponse;
-import spring.board.dto.UserSession;
+import spring.board.domain.response.CommonResponse;
+import spring.board.domain.response.ResponseStatus;
+import spring.board.dto.comment.CommentResponse;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,21 +29,21 @@ public class MyPageController {
 
     // 내가 작성한 글
     @GetMapping("/boards")
-    public Map myBoards(
+    public CommonResponse myBoards(
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "size", required = false, defaultValue = "10") int size,
-            @RequestParam(name = "blockSize",  required = false, defaultValue = "10") int blockSize,
-            HttpServletRequest request) {
+            @RequestParam(name = "blockSize",  required = false, defaultValue = "10") int blockSize) throws Exception {
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("boardInfo", boardService.selectPostsByUserId(page, size, blockSize, request));
+        resultMap.put("boardInfo", boardService.selectPostsByUserId(page, size, blockSize));
         resultMap.put("pageInfo", boardService.getPagingInfo(page, size, blockSize));
-        return resultMap;
+        return new CommonResponse<>(ResponseStatus.SUCCESS, "게시물 조회 완료", resultMap);
     }
     
     // 내가 작성한 댓글
     @GetMapping("/comments")
-    public List<CommentResponse> myComments(HttpServletRequest request) {
-        return commentService.selectCommentsByUserId(request);
+    public CommonResponse myComments() throws Exception {
+        List<CommentResponse> comments = commentService.selectCommentsByUserId();
+        return new CommonResponse<>(ResponseStatus.SUCCESS, "댓글 조회 완료", comments);
     }
 
 }

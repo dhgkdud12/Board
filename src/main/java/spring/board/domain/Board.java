@@ -1,4 +1,4 @@
-package spring.board.dto;
+package spring.board.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,16 +9,15 @@ import java.sql.Timestamp;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+public class Board {
 
-public class BoardResponse {
     private Integer boardNo;
     private String title;
     private String content;
     private Integer userIdx;
-    private String userName;
     private Timestamp createDate;
     private Timestamp updateDate;
-}
 
+}

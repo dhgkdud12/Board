@@ -1,4 +1,4 @@
-package spring.board.dto;
+package spring.board.dto.user;
 
 
 import lombok.AllArgsConstructor;

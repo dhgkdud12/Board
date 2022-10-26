@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="spring.board.dao.MyBatis.CommentMapper">
-    <insert id="insertRootComment" parameterType="spring.board.entity.Comment">
+    <insert id="insertRootComment" parameterType="spring.board.domain.Comment">
         <selectKey keyProperty="groupNo" resultType="Integer" order="BEFORE">
             SELECT IFNULL(MAX(group_no), 0)+1 FROM comment WHERE parent_id IS NULL
         </selectKey>
@@ -12,8 +12,8 @@
         values (#{boardNo}, #{content}, #{userIdx}, #{date}, 0, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
     </insert>
 
-    <insert id="insertComment" parameterType="spring.board.entity.Comment">
-        <selectKey keyProperty="groupNo,layer,groupOrd" resultType="spring.board.entity.Comment" order="BEFORE">
+    <insert id="insertComment" parameterType="spring.board.domain.Comment">
+        <selectKey keyProperty="groupNo,layer,groupOrd" resultType="spring.board.domain.Comment" order="BEFORE">
             SELECT group_no AS groupNo
                    , layer+1 AS layer,
                             (SELECT IFNULL(max(group_ord)+1, 0)
@@ -21,8 +21,6 @@
                              WHERE parent_id = #{parentId}) as groupOrd
             FROM comment WHERE comment_no = #{parentId} AND board_no = #{boardNo}
         </selectKey>
-
---         부모 댓글에 자식 수 +1 증가
 
         INSERT INTO comment (board_no, content, user_idx, date, parent_id, group_no, layer, child_cnt, group_ord)
         VALUES (#{boardNo}, #{content}, #{userIdx}, #{date}, #{parentId}, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
@@ -33,7 +31,7 @@
                        WHERE comment_no = #{parentId}
     </update>
 
-    <resultMap id="commentMap" type="spring.board.dto.CommentResponse">
+    <resultMap id="commentMap" type="spring.board.dto.comment.CommentResponse">
         <result column="comment_no" property="commentNo"></result>
         <result column="board_no" property="boardNo"></result>
         <result column="content" property="content"></result>
@@ -57,7 +55,7 @@
         WHERE comment_no = #{bIdx}
     </select>
 
-    <select id="selectCommentByCommentId" parameterType="Integer" resultType="spring.board.dto.CommentResponse">
+    <select id="selectCommentByCommentId" parameterType="Integer" resultType="spring.board.dto.comment.CommentResponse">
         SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
         FROM comment c
             INNER JOIN user u

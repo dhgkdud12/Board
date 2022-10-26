@@ -1,10 +1,11 @@
 package spring.board.controller;
 
 import org.springframework.web.bind.annotation.*;
-import spring.board.dto.UserLoginRequest;
-import spring.board.dto.UserRequest;
+import spring.board.domain.response.CommonResponse;
+import spring.board.domain.response.ResponseStatus;
+import spring.board.dto.user.UserLoginRequest;
+import spring.board.dto.user.UserRequest;
 import spring.board.service.UserService;
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/user")
@@ -18,19 +19,22 @@ public class UserController {
 
     // 회원가입
     @PostMapping("")
-    public String register(@RequestBody UserRequest userRequest) {
-        return userService.register(userRequest);
+    public CommonResponse register(@RequestBody UserRequest userRequest) {
+        String message = userService.register(userRequest);
+        return new CommonResponse(ResponseStatus.SUCCESS, message, null);
     }
 
     // 로그인
     @PostMapping ("/login")
-    public String logIn(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
-        return userService.login(userLoginRequest, request);
+    public CommonResponse logIn(@RequestBody UserLoginRequest userLoginRequest) throws Exception {
+        String message = userService.login(userLoginRequest);
+        return new CommonResponse(ResponseStatus.SUCCESS, message, null);
     }
     
     // 로그아웃
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request) {
-        return userService.logout(request);
+    public CommonResponse logout() throws Exception {
+        String message = userService.logout();
+        return new CommonResponse(ResponseStatus.SUCCESS, message, null);
     }
 }
