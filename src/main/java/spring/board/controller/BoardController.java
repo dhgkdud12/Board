@@ -2,7 +2,6 @@ package spring.board.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import spring.board.domain.User;
 import spring.board.domain.response.CommonResponse;
 import spring.board.domain.response.ResponseStatus;
 import spring.board.dto.board.BoardInfoResponse;
@@ -12,7 +11,6 @@ import spring.board.dto.comment.CommentRequest;
 import spring.board.dto.user.UserSession;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
-import spring.board.service.UserService;
 import spring.board.util.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,12 +22,10 @@ import java.util.Map;
 @RequestMapping("board")
 public class BoardController {
     private final BoardService boardService;
-    private final UserService userService;
     private final CommentService commentService;
 
-    public BoardController(BoardService boardService, UserService userService, CommentService commentService) {
+    public BoardController(BoardService boardService, CommentService commentService) {
         this.boardService = boardService;
-        this.userService = userService;
         this.commentService = commentService;
     }
 

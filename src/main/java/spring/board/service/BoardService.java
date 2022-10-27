@@ -16,8 +16,6 @@ import spring.board.dto.user.UserSession;
 import spring.board.util.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 
