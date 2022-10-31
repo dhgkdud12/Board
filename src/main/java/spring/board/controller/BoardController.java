@@ -51,7 +51,7 @@ public class BoardController {
         resultMap.put("boardInfo", boardService.selectAllPosts(searchType, keyword, curPage, size, blockSize));
         resultMap.put("pageInfo", boardService.getPagingInfo(curPage, size, blockSize));
 
-        return new CommonResponse<>(ResponseStatus.SUCCESS, "게시물 조회 성공", resultMap);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "게시물 조회 성공", resultMap);
     }
 
 
@@ -59,13 +59,13 @@ public class BoardController {
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CommonResponse post(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
         String message = boardService.post(boardRequest, request);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, message, null);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
     }
 
     @GetMapping("/{bIdx}")
     public CommonResponse selectPost(@PathVariable("bIdx") Integer bIdx) {
         BoardInfoResponse boardInfo = boardService.selectPostsByPostId(bIdx);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, "게시물 조회 완료", boardInfo);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "게시물 조회 완료", boardInfo);
 
     }
     
@@ -74,7 +74,7 @@ public class BoardController {
     @PutMapping("/{bIdx}")
     public CommonResponse updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardRequest boardRequest, HttpServletRequest request) {
         String message = boardService.updatePost(bIdx, boardRequest, request);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, message, null);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
     }
     
     // 게시물 삭제
@@ -82,26 +82,26 @@ public class BoardController {
     @DeleteMapping("/{bIdx}")
     public CommonResponse deletePost(@PathVariable("bIdx")Integer bIdx, HttpServletRequest request) {
         String message = boardService.deletePost(bIdx, request);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, message, null);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
     }
 
     // 댓글 작성
     @PostMapping("/{bIdx}")
     public CommonResponse postComment(@PathVariable("bIdx") Integer bIdx, @RequestBody CommentRequest commentRequest, HttpServletRequest request) {
         String message = commentService.post(bIdx, commentRequest, request);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, message, null);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
     }
 
     @GetMapping("/{bIdx}/comment")
     public CommonResponse selectComment(@PathVariable("bIdx") Integer bIdx) {
         List<CommentDto> comments = commentService.selectCommentsByPostId(bIdx);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, "댓글 조회 완료", comments);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "댓글 조회 완료", comments);
     }
 
     @DeleteMapping("/{bIdx}/comment/{cIdx}")
     public CommonResponse deleteComment(@PathVariable("bIdx") Integer bIdx, @PathVariable("cIdx") Integer cIdx, HttpServletRequest request) {
         String message = commentService.delete(cIdx, request);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, message, null
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null
         );
     }
 

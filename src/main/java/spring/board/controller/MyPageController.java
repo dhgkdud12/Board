@@ -38,14 +38,14 @@ public class MyPageController {
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("boardInfo", boardService.selectPostsByUserId(page, size, blockSize, request));
         resultMap.put("pageInfo", boardService.getPagingInfo(page, size, blockSize));
-        return new CommonResponse<>(ResponseStatus.SUCCESS, "게시물 조회 완료", resultMap);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "게시물 조회 완료", resultMap);
     }
     
     // 내가 작성한 댓글
     @GetMapping("/comments")
     public CommonResponse myComments(HttpServletRequest request) {
         List<CommentResponse> comments = commentService.selectCommentsByUserId(request);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, "댓글 조회 완료", comments);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "댓글 조회 완료", comments);
     }
 
 }

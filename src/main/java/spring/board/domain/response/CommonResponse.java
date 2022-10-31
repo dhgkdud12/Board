@@ -1,13 +1,31 @@
 package spring.board.domain.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
+
 public class CommonResponse<T> {
-    private final ResponseStatus status;
-    private final String message;
-    private final T data;
-    // 에러
+    private LocalDateTime timestamp = LocalDateTime.now();
+    private ResponseStatus status;
+    private int code;
+    private String message;
+    private T data;
+
+
+    public CommonResponse(ResponseStatus status, int code, String message, T data) {
+        this.status = status;
+        this.code = code;
+        this.message = message;
+        this.data = data;
+    }
+
+    public CommonResponse(int errorCode, String errorMessage) {
+        this.status = ResponseStatus.FAILURE;
+        this.code = errorCode;
+        this.message = errorMessage;
+    }
 }

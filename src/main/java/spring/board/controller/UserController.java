@@ -20,22 +20,22 @@ public class UserController {
 
     // 회원가입
     @PostMapping("")
-    public CommonResponse register(@RequestBody UserRequest userRequest) {
+    public CommonResponse register(@RequestBody UserRequest userRequest) throws Exception {
         String message = userService.register(userRequest);
-        return new CommonResponse(ResponseStatus.SUCCESS, message, null);
+        return new CommonResponse(ResponseStatus.SUCCESS, 200, message, null);
     }
 
     // 로그인
     @PostMapping ("/login")
     public CommonResponse logIn(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         String message = userService.login(userLoginRequest, request);
-        return new CommonResponse(ResponseStatus.SUCCESS, message, null);
+        return new CommonResponse(ResponseStatus.SUCCESS, 200, message, null);
     }
     
     // 로그아웃
     @GetMapping("/logout")
     public CommonResponse logout(HttpServletRequest request) {
         String message = userService.logout(request);
-        return new CommonResponse(ResponseStatus.SUCCESS, message, null);
+        return new CommonResponse(ResponseStatus.SUCCESS, 200, message, null);
     }
 }

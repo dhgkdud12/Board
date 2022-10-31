@@ -24,10 +24,10 @@ public class FileController {
     public CommonResponse download(@PathVariable("fIdx") Integer fIdx) throws IOException {
         ResponseEntity<Object> entity = fileService.downloadFilefromFTP(fIdx);
         if (entity.getStatusCode().value() == 200) {
-            return new CommonResponse<>(ResponseStatus.SUCCESS, "파일 다운로드 성공", entity);
+            return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "파일 다운로드 성공", entity);
         }
         else
-            return new CommonResponse<>(ResponseStatus.FAILURE, "파일 다운로드 실패", entity);
+            return new CommonResponse<>(ResponseStatus.FAILURE, 200, "파일 다운로드 실패", entity);
     }
 
 }

@@ -2,6 +2,8 @@ package spring.board.service;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import spring.board.common.ErrorCode;
+import spring.board.common.TicketingException;
 import spring.board.dao.MyBatis.UserMapper;
 import spring.board.dto.user.UserLoginRequest;
 import spring.board.dto.user.UserRequest;
@@ -25,9 +27,10 @@ public class UserService {
     }
 
 
-    public String register(UserRequest userRequest) {
+    public String register(UserRequest userRequest)throws  Exception {
+
         if (userMapper.selectUserId(userRequest.getId()) == 1) {
-            return "이미 해당 ID가 존재";
+            throw new TicketingException(ErrorCode.DUPLICATE_ID);
         }
         String hashPassword = BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt());
         userRequest.setPassword(hashPassword);
@@ -46,18 +49,17 @@ public class UserService {
         User loginUser = userMapper.selectUser(userLoginRequest.getId());
 //                userDao.selectUser(userLoginRequest.getId());
         if (loginUser == null) {
-            System.out.println("사용자 id 없음");
+            throw new TicketingException(ErrorCode.MISMATCH_ID);
         } else {
             if (BCrypt.checkpw(userLoginRequest.getPassword(), loginUser.getPassword())){
                 if (createUserSession(loginUser, request) == null) {
-                    System.out.println("유저 세션 생성 실패");
+                    throw new TicketingException(ErrorCode.FAIL_SESSION);
                 }
                 return "로그인 완료";
             } else {
-                System.out.println("비밀번호가 올바르지 않음.");
+                throw new TicketingException(ErrorCode.MISMATCH_PASSWORD);
             }
         }
-        return "로그인 실패";
     }
 
     public UserSession createUserSession(User loginUser, HttpServletRequest request) {

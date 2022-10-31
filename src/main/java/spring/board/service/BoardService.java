@@ -1,6 +1,8 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
+import spring.board.common.ErrorCode;
+import spring.board.common.TicketingException;
 import spring.board.dao.JdbcTemplate.JdbcBoardDao;
 import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.JdbcTemplate.JdbcFileDao;
@@ -54,17 +56,14 @@ public class BoardService {
 //            int bIdx = boardDao.insertPost(board);
             Integer bIdx = boardMapper.insertPost(board);
 
-            if (bIdx == null) {
-                return "게시물 작성 실패";
-            } else {
+            if (bIdx != null) {
                 if (boardRequest.getFile() != null) {
                     boardRequest.setId(bIdx);
                     fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
                 }
             }
         } else {
-            System.out.println("로그인을 먼저 해주세요.");
-            return "게시물 작성 실패";
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
         return "게시물 작성 완료";
     }
@@ -126,8 +125,7 @@ public class BoardService {
             List<BoardResponse> list = boardMapper.selectPostsByUserId(map);
             return list;
         } else {
-            System.out.println("로그인을 먼저 해주세요.");
-            return null;
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
     }
 
@@ -141,12 +139,11 @@ public class BoardService {
                 boardMapper.updatePost(boardUpdateRequest);
                 return "게시물 수정 완료";
             } else {
-                System.out.println("본인 게시물만 삭제 가능");
+                throw new TicketingException(ErrorCode.INVALID_USER);
             }
         } else {
-            System.out.println("사용자 로그인 정보 없음");
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
-        return "게시물 수정 실패";
     }
 
     public String deletePost(Integer bIdx, HttpServletRequest request) {
@@ -159,12 +156,11 @@ public class BoardService {
                 boardMapper.deletePost(bIdx);
                 return "게시물 삭제 완료";
             } else {
-                System.out.println("본인 게시물만 삭제 가능");
+                throw new TicketingException(ErrorCode.INVALID_USER);
             }
         } else {
-            System.out.println("사용자 로그인 정보 없음");
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
-        return "게시물 삭제 실패";
     }
 
     public BoardResponse searchPosts(String q) {
