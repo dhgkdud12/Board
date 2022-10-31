@@ -1,8 +1,8 @@
 package spring.board.dao.MyBatis;
 
 import org.apache.ibatis.annotations.Mapper;
-import spring.board.dto.BoardResponse;
-import spring.board.dto.BoardUpdateRequest;
+import spring.board.dto.board.BoardResponse;
+import spring.board.dto.board.BoardUpdateRequest;
 import spring.board.entity.Board;
 import spring.board.entity.Paging;
 

@@ -30,7 +30,7 @@
         VALUES (#{boardNo}, #{content}, #{userIdx}, #{date}, #{parentId}, #{groupNo}, #{layer}, #{childCnt}, #{groupOrd})
     </insert>
 
-    <resultMap id="commentMap" type="spring.board.dto.CommentResponse">
+    <resultMap id="commentMap" type="spring.board.dto.comment.CommentResponse">
         <result column="comment_no" property="commentNo"></result>
         <result column="board_no" property="boardNo"></result>
         <result column="content" property="content"></result>
@@ -53,7 +53,7 @@
         WHERE comment_no = #{bIdx}
     </select>
 
-    <select id="selectCommentByCommentId" parameterType="Integer" resultType="spring.board.dto.CommentResponse">
+    <select id="selectCommentByCommentId" parameterType="Integer" resultType="spring.board.dto.comment.CommentResponse">
         SELECT c.comment_no, c.board_no, c.content, c.user_idx, u.name as user_name, c.date, c.parent_id, c.group_no, layer, child_cnt, group_ord
         FROM comment c
             INNER JOIN user u

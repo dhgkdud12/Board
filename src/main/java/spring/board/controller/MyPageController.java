@@ -4,9 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import spring.board.dto.BoardResponse;
-import spring.board.dto.CommentResponse;
-import spring.board.dto.UserSession;
+import spring.board.dto.comment.CommentResponse;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 

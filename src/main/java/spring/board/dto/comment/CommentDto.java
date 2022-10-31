@@ -1,4 +1,4 @@
-package spring.board.dto;
+package spring.board.dto.comment;
 
 import lombok.*;
 

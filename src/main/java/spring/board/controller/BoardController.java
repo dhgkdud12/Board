@@ -2,7 +2,11 @@ package spring.board.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import spring.board.dto.*;
+import spring.board.dto.board.BoardInfoResponse;
+import spring.board.dto.board.BoardRequest;
+import spring.board.dto.comment.CommentDto;
+import spring.board.dto.comment.CommentRequest;
+import spring.board.dto.user.UserSession;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 import spring.board.service.UserService;

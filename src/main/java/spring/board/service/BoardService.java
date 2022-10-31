@@ -1,12 +1,16 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
-import spring.board.dao.JdbcTemplate.JdbcBoardDao;
-import spring.board.dao.JdbcTemplate.JdbcCommentDao;
-import spring.board.dao.JdbcTemplate.JdbcFileDao;
 import spring.board.dao.MyBatis.BoardMapper;
 import spring.board.dao.MyBatis.FileMapper;
 import spring.board.dto.*;
+import spring.board.dto.board.BoardInfoResponse;
+import spring.board.dto.board.BoardRequest;
+import spring.board.dto.board.BoardResponse;
+import spring.board.dto.board.BoardUpdateRequest;
+import spring.board.dto.file.FileRequest;
+import spring.board.dto.file.FileResponse;
+import spring.board.dto.user.UserSession;
 import spring.board.entity.Board;
 import spring.board.entity.Paging;
 
@@ -28,7 +32,7 @@ public class BoardService {
     //    private final JdbcBoardDao boardDao;
 //    private final JdbcFileDao fileDao;
 
-    public BoardService(UserService userService, FileService fileService, CommentService commentService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao, BoardMapper boardMapper, FileMapper fileMapper) {
+    public BoardService(UserService userService, FileService fileService, CommentService commentService, BoardMapper boardMapper, FileMapper fileMapper) {
         this.userService = userService;
         this.fileService = fileService;
         this.commentService = commentService;
@@ -54,7 +58,8 @@ public class BoardService {
                 fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
                 return "게시물 작성 완료";
             }
-        } else {
+        }
+        else {
             System.out.println("로그인을 먼저 해주세요.");
         }
         return "게시물 작성 실패";

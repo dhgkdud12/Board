@@ -4,7 +4,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import spring.board.dto.CommentResponse;
+import spring.board.dto.comment.CommentResponse;
 import spring.board.entity.Comment;
 
 import java.sql.ResultSet;

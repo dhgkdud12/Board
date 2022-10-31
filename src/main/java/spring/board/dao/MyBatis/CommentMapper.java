@@ -1,7 +1,7 @@
 package spring.board.dao.MyBatis;
 
 import org.apache.ibatis.annotations.Mapper;
-import spring.board.dto.CommentResponse;
+import spring.board.dto.comment.CommentResponse;
 import spring.board.entity.Comment;
 
 import java.util.List;

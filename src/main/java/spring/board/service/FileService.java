@@ -12,8 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import spring.board.dao.MyBatis.FileMapper;
-import spring.board.dto.BoardRequest;
-import spring.board.dto.FileRequest;
+import spring.board.dto.board.BoardRequest;
+import spring.board.dto.file.FileRequest;
 import spring.board.entity.FileEntity;
 
 import javax.servlet.http.HttpServletRequest;

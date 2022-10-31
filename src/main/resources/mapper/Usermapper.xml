@@ -7,7 +7,7 @@
         <select id="selectUser" parameterType="String" resultType="spring.board.entity.User">
             SELECT * FROM user WHERE id = #{id}
         </select>
-        <insert id="insertUser" parameterType="spring.board.dto.UserRequest">
+        <insert id="insertUser" parameterType="spring.board.dto.user.UserRequest">
             INSERT INTO user(id, name, password, email)
             VALUES (#{id}, #{name}, #{password}, #{email})
         </insert>

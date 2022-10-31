@@ -9,7 +9,7 @@
         VALUES (#{title}, #{content}, #{userIdx}, #{createDate}, #{updateDate})
     </insert>
 
-    <select id="selectPostByPostId" parameterType="Integer" resultType="spring.board.dto.BoardResponse">
+    <select id="selectPostByPostId" parameterType="Integer" resultType="spring.board.dto.board.BoardResponse">
         SELECT b.board_no, b.title, b.content, b.user_idx, u.name AS user_name, b.create_date, b.update_date
         FROM board b
             INNER JOIN user u
@@ -17,7 +17,7 @@
         WHERE b.board_no = #{id}
     </select>
 
-    <select id="selectPostsByUserId" parameterType="hashmap" resultType="spring.board.dto.BoardResponse">
+    <select id="selectPostsByUserId" parameterType="hashmap" resultType="spring.board.dto.board.BoardResponse">
         SELECT board_no, title, content, user_idx, name AS user_name, create_date, update_date
         FROM
             (SELECT ROW_NUMBER() OVER ( ORDER BY board_no ASC) AS row_num, board_no, title, content, user_idx, create_date, update_date
@@ -32,7 +32,7 @@
         SELECT count(*) FROM board
     </select>
 
-    <resultMap id="boardMap" type="spring.board.dto.BoardResponse">
+    <resultMap id="boardMap" type="spring.board.dto.board.BoardResponse">
         <result column="board_no" property="boardNo"></result>
         <result column="title" property="title"></result>
         <result column="content" property="content"></result>
@@ -40,7 +40,7 @@
         <result column="user_name" property="userName"></result>
         <result column="create_date" property="createDate"></result>
         <result column="update_date" property="updateDate"></result>
-<!--        <collection property="boards" column="boardNo" javaType="java.util.List" ofType="spring.board.dto.BoardResponse" select="selectPost"> </collection>-->
+<!--        <collection property="boards" column="boardNo" javaType="java.util.List" ofType="spring.board.dto.board.BoardResponse" select="selectPost"> </collection>-->
     </resultMap>
 
     <select id="selectPost" parameterType= "spring.board.entity.Paging" resultMap="boardMap">
@@ -57,7 +57,7 @@
         ORDER BY row_num
     </select>
 
-    <update id="updatePost" parameterType="spring.board.dto.BoardUpdateRequest">
+    <update id="updatePost" parameterType="spring.board.dto.board.BoardUpdateRequest">
         UPDATE board
         SET title = #{title}, content = #{content}, update_date = #{updateTime}
         WHERE board_no = #{boardNo}

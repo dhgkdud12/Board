@@ -1,8 +1,8 @@
 package spring.board.controller;
 
 import org.springframework.web.bind.annotation.*;
-import spring.board.dto.UserLoginRequest;
-import spring.board.dto.UserRequest;
+import spring.board.dto.user.UserLoginRequest;
+import spring.board.dto.user.UserRequest;
 import spring.board.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 

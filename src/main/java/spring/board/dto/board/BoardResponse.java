@@ -1,4 +1,4 @@
-package spring.board.dto;
+package spring.board.dto.board;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,24 +7,18 @@ import lombok.Setter;
 
 import java.sql.Timestamp;
 
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentResponse {
-    private Integer commentNo;
+
+public class BoardResponse {
     private Integer boardNo;
+    private String title;
     private String content;
     private Integer userIdx;
     private String userName;
-    private Timestamp date;
-
-    private Integer parentId;
-    private Integer groupNo;
-    private Integer layer;
-    private Integer childCnt;
-    private Integer groupOrd;
-
+    private Timestamp createDate;
+    private Timestamp updateDate;
 }
 

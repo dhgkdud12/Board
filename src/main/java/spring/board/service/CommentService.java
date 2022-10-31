@@ -1,11 +1,12 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
-import spring.board.dao.JdbcTemplate.JdbcBoardDao;
-import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.MyBatis.BoardMapper;
 import spring.board.dao.MyBatis.CommentMapper;
-import spring.board.dto.*;
+import spring.board.dto.comment.CommentDto;
+import spring.board.dto.comment.CommentRequest;
+import spring.board.dto.comment.CommentResponse;
+import spring.board.dto.user.UserSession;
 import spring.board.entity.Comment;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ public class CommentService {
 //    private final JdbcBoardDao boardDao;
 //    private final JdbcCommentDao commentDao;
 
-    public CommentService(UserService userService, JdbcBoardDao boardDao, BoardMapper boardMapper, JdbcCommentDao commentDao, CommentMapper commentMapper) {
+    public CommentService(UserService userService, BoardMapper boardMapper, CommentMapper commentMapper) {
         this.userService = userService;
         this.boardMapper = boardMapper;
         this.commentMapper = commentMapper;
