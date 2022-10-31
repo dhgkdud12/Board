@@ -21,10 +21,10 @@ public class CommentResponse {
     private Timestamp date;
 
     private Integer parentId;
-    private Integer groupNo;
+    private Integer groupNo; // 댓글별 그룹, 1부터
     private Integer layer;
     private Integer childCnt;
-    private Integer groupOrd;
+    private Integer groupOrd; // 계층별 댓글 그룹 순서, 0부터
 
 }
 

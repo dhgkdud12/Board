@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="spring.board.dao.MyBatis.BoardMapper">
-    <insert id="insertPost" parameterType="spring.board.entity.Board">
+    <insert id="insertPost" parameterType="spring.board.domain.Board">
         INSERT INTO board (title, content, user_idx, create_date, update_date)
         VALUES (#{title}, #{content}, #{userIdx}, #{createDate}, #{updateDate})
     </insert>
@@ -37,22 +37,30 @@
         <result column="title" property="title"></result>
         <result column="content" property="content"></result>
         <result column="user_idx" property="userIdx"></result>
-        <result column="user_name" property="userName"></result>
+        <result column="name" property="userName"></result>
         <result column="create_date" property="createDate"></result>
         <result column="update_date" property="updateDate"></result>
 <!--        <collection property="boards" column="boardNo" javaType="java.util.List" ofType="spring.board.dto.board.BoardResponse" select="selectPost"> </collection>-->
     </resultMap>
 
-    <select id="selectPost" parameterType= "spring.board.entity.Paging" resultMap="boardMap">
-        SELECT b.board_no, b.title, b.content, b.user_idx, u.name AS user_name, b.create_date, b.update_date
-<!--        <if test="startIndex  null and startIndex   '' ">-->
-<!--             , create_date, update_date-->
-<!--        </if>-->
-        FROM
-            (SELECT ROW_NUMBER() OVER ( ORDER BY board_no ASC) AS row_num, board_no, title, content, user_idx, create_date, update_date
-             FROM board) b
-                INNER JOIN user u
-                    ON b.user_idx = u.idx
+    <select id="selectPost" parameterType= "spring.board.dto.board.BoardSearchRequest" resultMap="boardMap">
+        SELECT *
+        FROM (SELECT ROW_NUMBER() OVER ( ORDER BY board_no ASC) AS row_num, board_no, title, content, user_idx, name, create_date, update_date
+              FROM
+              (SELECT board_no, title, content, user_idx, name, create_date, update_date
+                FROM board b INNER JOIN user u ON b.user_idx = u.idx) r
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test = 'searchType == "title" and keyword != null and keyword != " "'>
+                AND title LIKE CONCAT('%',#{keyword}, '%')
+            </if>
+            <if test = 'searchType == "content" and keyword != null and keyword != " "'>
+                AND content LIKE CONCAT('%',#{keyword}, '%')
+            </if>
+            <if test = 'searchType == "name" and keyword != null and keyword != " "'>
+                AND name LIKE CONCAT('%',#{keyword}, '%')
+            </if>
+        </trim>
+            ) B
         WHERE row_num BETWEEN #{startIndex} AND #{endIndex}
         ORDER BY row_num
     </select>

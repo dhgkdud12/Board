@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import spring.board.dto.comment.CommentResponse;
-import spring.board.entity.Comment;
+import spring.board.domain.Comment;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,7 +27,7 @@ public class JdbcCommentDao {
         // parentId, groupNo
         if (comment.getParentId() == null) { // 루트 댓글일 때
             Integer groupNo = jdbcTemplate.queryForObject(
-                    "SELECT IFNULL(max(group_no),0)+1 " +
+                    "SELECT IFNULL(MAX(group_no),0)+1 " +
                     "FROM comment " +
                     "WHERE parent_id IS null;",
                     Integer.class);

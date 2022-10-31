@@ -25,4 +25,5 @@ public class CommentDto {
     private Integer groupOrd;
 
     private List<CommentDto> commentDtos;
+    // dto로 하거나 대댓글 lst 잎자리 차지
 }

@@ -16,6 +16,7 @@ import java.util.List;
 public class BoardInfoResponse {
     private BoardResponse boardResponse;
     private FileResponse fileResponse;
+//    private List<CommentResponse> commentDtos;
     private List<CommentDto> commentDtos;
 }
 
