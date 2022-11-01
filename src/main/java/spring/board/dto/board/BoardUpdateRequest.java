@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -15,6 +15,6 @@ public class BoardUpdateRequest {
     private Integer boardNo;
     private String title;
     private String content;
-    private Timestamp updateTime;
+    private Date updateTime;
 }
 
