@@ -1,8 +1,9 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
-import spring.board.common.ErrorCode;
-import spring.board.common.TicketingException;
+import spring.board.common.response.exception.ErrorCode;
+import spring.board.common.response.exception.TicketingException;
+import spring.board.common.response.SuccessMessage;
 import spring.board.dao.JdbcTemplate.JdbcBoardDao;
 import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.JdbcTemplate.JdbcFileDao;
@@ -15,10 +16,9 @@ import spring.board.dto.common.PageInfo;
 import spring.board.dto.file.FileRequest;
 import spring.board.dto.file.FileResponse;
 import spring.board.dto.user.UserSession;
-import spring.board.util.SessionUtils;
+import spring.board.service.file.FTPFileService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -27,7 +27,7 @@ import java.util.*;
 //@RequiredArgsConstructor
 public class BoardService {
     private final UserService userService;
-    private final FileService fileService;
+    private final FTPFileService fileService;
     private final CommentService commentService;
     private final BoardMapper boardMapper;
     private final FileMapper fileMapper;
@@ -35,7 +35,7 @@ public class BoardService {
     //    private final JdbcBoardDao boardDao;
 //    private final JdbcFileDao fileDao;
 
-    public BoardService(UserService userService, FileService fileService, CommentService commentService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao, BoardMapper boardMapper, FileMapper fileMapper) {
+    public BoardService(UserService userService, FTPFileService fileService, CommentService commentService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao, BoardMapper boardMapper, FileMapper fileMapper) {
         this.userService = userService;
         this.fileService = fileService;
         this.commentService = commentService;
@@ -46,8 +46,6 @@ public class BoardService {
 
     }
 
-
-
     public String post(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
 //        HttpSession session = request.getSession();
 //        UserSession userSession = (UserSession) session.getAttribute("USER");
@@ -57,18 +55,17 @@ public class BoardService {
         if (userSession != null) {
             Board board = new Board(null, boardRequest.getTitle(), boardRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), null);
 //            int bIdx = boardDao.insertPost(board);
-            Integer bIdx = boardMapper.insertPost(board);
+            boardMapper.insertPost(board);
+            boardRequest.setBId(board.getBoardNo());
 
-            if (bIdx != null) {
-                if (boardRequest.getFile() != null) {
-                    boardRequest.setId(bIdx);
-                    fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
-                }
+            Integer bIdx = boardRequest.getBId();
+            if (boardRequest.getFile() != null) {
+                fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
             }
         } else {
             throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
-        return "게시물 작성 완료";
+        return "게시물 " + SuccessMessage.SUCCESS_CREATE.getMessage();
     }
 
     // 페이지
@@ -86,12 +83,7 @@ public class BoardService {
         return pageInfo;
     }
 
-    public BoardResponse selectPostByPostId(Integer bIdx) {
-        BoardResponse boardResponse = boardMapper.selectPostByPostId(bIdx);
-        return boardResponse;
-    }
-
-    public BoardInfoResponse selectPostsByPostId(Integer bIdx) {
+    public BoardInfoResponse selectPostByPostId(Integer bIdx) {
 //        FileRequest file = fileDao.selectFileByBoardId(bIdx);
         FileRequest file = fileMapper.selectFileByBoardId(bIdx);
         FileResponse fileResponse;
@@ -106,11 +98,6 @@ public class BoardService {
                         commentService.selectCommentsByPostId(bIdx));
 
         return boardInfoResponse;
-    }
-
-    public List<BoardResponse> selectPostAndCommentByPostId(Integer bIdx) {
-        BoardResponse boardResponse = new BoardResponse();
-        return null;
     }
 
     // 내 게시물 - 사용자 검색
@@ -133,13 +120,18 @@ public class BoardService {
 
     public String updatePost(Integer bIdx, BoardRequest boardRequest) {
         UserSession userSession = userService.getLoginUserInfo();
+
+        if (boardMapper.selectPostByPostId(bIdx) == null) {
+            throw new TicketingException(ErrorCode.INVALID_BOARD);
+        }
+
         Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
 
         if (userSession != null ) {
             if (b_uidx.equals(userSession.getIdx())) {
                 BoardUpdateRequest boardUpdateRequest = new BoardUpdateRequest(bIdx, boardRequest.getTitle(), boardRequest.getContent(), new Timestamp(new Date().getTime()));
                 boardMapper.updatePost(boardUpdateRequest);
-                return "게시물 수정 완료";
+                return "게시물 " + SuccessMessage.SUCCESS_UPDATE.getMessage();
             } else {
                 throw new TicketingException(ErrorCode.INVALID_USER);
             }
@@ -151,12 +143,17 @@ public class BoardService {
     public String deletePost(Integer bIdx) {
 
         UserSession userSession = userService.getLoginUserInfo();
+
+        if (boardMapper.selectPostByPostId(bIdx) == null) {
+            throw new TicketingException(ErrorCode.INVALID_BOARD);
+        }
+
         Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
 
         if (userSession != null ) {
             if (b_uidx.equals(userSession.getIdx())) {
                 boardMapper.deletePost(bIdx);
-                return "게시물 삭제 완료";
+                return "게시물 " + SuccessMessage.SUCCESS_DELETE.getMessage();
             } else {
                 throw new TicketingException(ErrorCode.INVALID_USER);
             }

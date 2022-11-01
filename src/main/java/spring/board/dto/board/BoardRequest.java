@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardRequest {
-    private int id;
+    private int bId;
     private String title;
     private String content;
     private MultipartFile file;

@@ -2,8 +2,9 @@ package spring.board.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import spring.board.domain.response.CommonResponse;
-import spring.board.domain.response.ResponseStatus;
+import spring.board.common.response.CommonResponse;
+import spring.board.common.response.SuccessMessage;
+import spring.board.common.response.ResponseStatus;
 import spring.board.dto.board.BoardInfoResponse;
 import spring.board.dto.board.BoardRequest;
 import spring.board.dto.comment.CommentDto;
@@ -49,7 +50,7 @@ public class BoardController {
         resultMap.put("boardInfo", boardService.selectAllPosts(searchType, keyword, curPage, size, blockSize));
         resultMap.put("pageInfo", boardService.getPagingInfo(curPage, size, blockSize));
 
-        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "게시물 조회 성공", resultMap);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_READ.getMessage(), resultMap);
     }
 
 
@@ -62,8 +63,8 @@ public class BoardController {
 
     @GetMapping("/{bIdx}")
     public CommonResponse selectPost(@PathVariable("bIdx") Integer bIdx) {
-        BoardInfoResponse boardInfo = boardService.selectPostsByPostId(bIdx);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "게시물 조회 완료", boardInfo);
+        BoardInfoResponse boardInfo = boardService.selectPostByPostId(bIdx);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_READ.getMessage(), boardInfo);
 
     }
     
@@ -93,7 +94,7 @@ public class BoardController {
     @GetMapping("/{bIdx}/comment")
     public CommonResponse selectComment(@PathVariable("bIdx") Integer bIdx) {
         List<CommentDto> comments = commentService.selectCommentsByPostId(bIdx);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "댓글 조회 완료", comments);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_READ.getMessage(), comments);
     }
 
     @DeleteMapping("/{bIdx}/comment/{cIdx}")

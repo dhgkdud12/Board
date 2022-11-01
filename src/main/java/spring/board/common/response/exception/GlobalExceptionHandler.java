@@ -1,12 +1,10 @@
-package spring.board.controller;
+package spring.board.common.response.exception;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
-import spring.board.common.ErrorCode;
-import spring.board.common.TicketingException;
-import spring.board.domain.response.CommonResponse;
+import spring.board.common.response.CommonResponse;
 
 
 @ControllerAdvice // 모든 컨트롤러에서 발생하는 예외 잡음

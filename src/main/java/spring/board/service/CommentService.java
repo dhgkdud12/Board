@@ -1,8 +1,9 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
-import spring.board.common.ErrorCode;
-import spring.board.common.TicketingException;
+import spring.board.common.response.exception.ErrorCode;
+import spring.board.common.response.exception.TicketingException;
+import spring.board.common.response.SuccessMessage;
 import spring.board.dao.MyBatis.BoardMapper;
 import spring.board.dao.MyBatis.CommentMapper;
 import spring.board.domain.Comment;
@@ -26,11 +27,11 @@ public class CommentService {
 //    private final JdbcCommentDao commentDao;
 
     public CommentService(BoardMapper boardMapper, CommentMapper commentMapper, UserService userService) {
+        this.userService = userService;
         this.boardMapper = boardMapper;
         this.commentMapper = commentMapper;
 //        this.boardDao = boardDao;
 //        this.commentDao = commentDao;
-        this.userService = userService;
     }
 
     private CommentDto createCommentListDto(CommentResponse commentResponse) {
@@ -307,29 +308,32 @@ public class CommentService {
 //            comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), commentRequest.getParentId(), null, 0, 0, 0);
 //            jdbcCommentDao.insertComment(comment);
 
-            return "댓글 작성 완료";
-
+            return "댓글 " + SuccessMessage.SUCCESS_CREATE.getMessage();
         } else {
             throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
     }
 
     // 댓글 삭제시 삭제된 댓글입니다로 변경
-    public String delete(Integer cIdx) throws Exception { // 글이 존재하지 않을 경우
+    public String delete(Integer cIdx) throws Exception {
 //        UserSession userSession = userService.getLoginUserInfo(request);
         UserSession userSession = userService.getLoginUserInfo();
         Integer c_uidx = commentMapper.selectCommentByCommentId(cIdx).getUserIdx();
 
         if (c_uidx == null) throw new TicketingException(ErrorCode.INVALID_COMMENT);
-        else if (userSession != null ) {
-            if (c_uidx.equals(userSession.getIdx())) {
-                commentMapper.deleteComment(cIdx);
-                return "댓글 삭제 완료";
-            } else {
-                throw new TicketingException(ErrorCode.INVALID_USER);
+        else {
+            if (userSession != null) {
+                if (c_uidx.equals(userSession.getIdx())) {
+                    commentMapper.deleteComment(cIdx);
+                    return "댓글 " + SuccessMessage.SUCCESS_DELETE.getMessage();
+                } else {
+                    throw new TicketingException(ErrorCode.INVALID_USER);
+                }
+            }
+            else {
+                throw new TicketingException(ErrorCode.INVALID_LOGIN);
             }
         }
-        return "댓글 삭제 실패";
     }
 
     public List<CommentResponse> selectCommentsByUserId() {

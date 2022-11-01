@@ -1,4 +1,4 @@
-package spring.board.domain.response;
+package spring.board.common.response;
 
 public enum ResponseStatus {
     SUCCESS, FAILURE

@@ -1,4 +1,4 @@
-package spring.board.domain.response;
+package spring.board.common.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

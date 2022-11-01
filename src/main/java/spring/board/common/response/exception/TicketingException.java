@@ -1,4 +1,4 @@
-package spring.board.common;
+package spring.board.common.response.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
