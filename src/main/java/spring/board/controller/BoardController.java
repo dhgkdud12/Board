@@ -39,15 +39,13 @@ public class BoardController {
             @RequestParam(name = "size", required = false, defaultValue = "10") int size,
             @RequestParam(name = "blockSize", required = false, defaultValue = "5") int blockSize,
             @RequestParam(name = "searchType", required = false, defaultValue = "title") String searchType,
-            @RequestParam(name = "keyword", required = false) String keyword,
-            HttpServletRequest request) {
+            @RequestParam(name = "keyword", required = false) String keyword) {
         Map<String, Object> resultMap = new HashMap<>();
-        UserSession userSession = userService.getLoginUserInfo(request);
+        UserSession userSession = userService.getLoginUserInfo();
         if (userSession != null) {
             System.out.println(userSession.getName()+"님 로그인중");
         }
         
-        // search객체에 paging 상속받아서 search 넘겨줌
         resultMap.put("boardInfo", boardService.selectAllPosts(searchType, keyword, curPage, size, blockSize));
         resultMap.put("pageInfo", boardService.getPagingInfo(curPage, size, blockSize));
 
@@ -72,23 +70,23 @@ public class BoardController {
     // 게시물 수정
     // 내가 작성한 게시물만 수정 가능
     @PutMapping("/{bIdx}")
-    public CommonResponse updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardRequest boardRequest, HttpServletRequest request) {
-        String message = boardService.updatePost(bIdx, boardRequest, request);
+    public CommonResponse updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardRequest boardRequest) {
+        String message = boardService.updatePost(bIdx, boardRequest);
         return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
     }
     
     // 게시물 삭제
     // 내가 삭제한 게시물만 삭제 가능
     @DeleteMapping("/{bIdx}")
-    public CommonResponse deletePost(@PathVariable("bIdx")Integer bIdx, HttpServletRequest request) {
-        String message = boardService.deletePost(bIdx, request);
+    public CommonResponse deletePost(@PathVariable("bIdx")Integer bIdx) {
+        String message = boardService.deletePost(bIdx);
         return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
     }
 
     // 댓글 작성
     @PostMapping("/{bIdx}")
-    public CommonResponse postComment(@PathVariable("bIdx") Integer bIdx, @RequestBody CommentRequest commentRequest, HttpServletRequest request) {
-        String message = commentService.post(bIdx, commentRequest, request);
+    public CommonResponse postComment(@PathVariable("bIdx") Integer bIdx, @RequestBody CommentRequest commentRequest) throws Exception {
+        String message = commentService.post(bIdx, commentRequest);
         return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
     }
 
@@ -99,8 +97,8 @@ public class BoardController {
     }
 
     @DeleteMapping("/{bIdx}/comment/{cIdx}")
-    public CommonResponse deleteComment(@PathVariable("bIdx") Integer bIdx, @PathVariable("cIdx") Integer cIdx, HttpServletRequest request) {
-        String message = commentService.delete(cIdx, request);
+    public CommonResponse deleteComment(@PathVariable("bIdx") Integer bIdx, @PathVariable("cIdx") Integer cIdx) throws Exception {
+        String message = commentService.delete(cIdx);
         return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null
         );
     }

@@ -9,6 +9,7 @@ import spring.board.dto.user.UserLoginRequest;
 import spring.board.dto.user.UserRequest;
 import spring.board.dto.user.UserSession;
 import spring.board.domain.User;
+import spring.board.util.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -39,9 +40,10 @@ public class UserService {
         return "회원가입 완료";
     }
 
-    public String login(UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public String login(UserLoginRequest userLoginRequest) {
 
-        if (request.getSession().getAttribute("USER") != null) {
+        UserSession userSession = getLoginUserInfo();
+        if (userSession != null) {
             return "이미 로그인중";
         }
 
@@ -52,7 +54,7 @@ public class UserService {
             throw new TicketingException(ErrorCode.MISMATCH_ID);
         } else {
             if (BCrypt.checkpw(userLoginRequest.getPassword(), loginUser.getPassword())){
-                if (createUserSession(loginUser, request) == null) {
+                if (createUserSession(loginUser) == null) {
                     throw new TicketingException(ErrorCode.FAIL_SESSION);
                 }
                 return "로그인 완료";
@@ -62,24 +64,29 @@ public class UserService {
         }
     }
 
-    public UserSession createUserSession(User loginUser, HttpServletRequest request) {
+//    public UserSession createUserSession(User loginUser, HttpServletRequest request) {
+    public UserSession createUserSession(User loginUser) {
         UserSession userSession = new UserSession(loginUser.getIdx(), loginUser.getName());
 
-        HttpSession httpSession = request.getSession();
-        httpSession.setAttribute("USER", userSession);
+//        HttpSession httpSession = request.getSession();
+//        httpSession.setAttribute("USER", userSession);
+
+        SessionUtils.setAttribute("USER", userSession);
 
         return userSession;
     }
 
-    // 로그인 확인
-    public UserSession getLoginUserInfo(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        return (UserSession) session.getAttribute("USER");
+    // 로그인한 유저 정보 가져오기
+    public UserSession getLoginUserInfo() {
+//        HttpSession session = request.getSession();
+//        return (UserSession) session.getAttribute("USER");
+        return (UserSession) SessionUtils.getAttribute("USER");
     }
 
-    public String logout(HttpServletRequest request) {
-        HttpSession httpSession = request.getSession();
-        httpSession.removeAttribute("USER");
+    public String logout() {
+//        HttpSession httpSession = request.getSession();
+//        httpSession.removeAttribute("USER");
+        SessionUtils.removeAttribute("USER");
         System.out.println("로그아웃");
         return "로그아웃 완료";
     }

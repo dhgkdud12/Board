@@ -15,6 +15,7 @@ import spring.board.dto.common.PageInfo;
 import spring.board.dto.file.FileRequest;
 import spring.board.dto.file.FileResponse;
 import spring.board.dto.user.UserSession;
+import spring.board.util.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -48,8 +49,10 @@ public class BoardService {
 
 
     public String post(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
-        HttpSession session = request.getSession();
-        UserSession userSession = (UserSession) session.getAttribute("USER");
+//        HttpSession session = request.getSession();
+//        UserSession userSession = (UserSession) session.getAttribute("USER");
+
+        UserSession userSession = userService.getLoginUserInfo();
 
         if (userSession != null) {
             Board board = new Board(null, boardRequest.getTitle(), boardRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), null);
@@ -111,9 +114,8 @@ public class BoardService {
     }
 
     // 내 게시물 - 사용자 검색
-    public List<BoardResponse> selectPostsByUserId(int page, int size, int blockSize, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        UserSession userSession = (UserSession) session.getAttribute("USER");
+    public List<BoardResponse> selectPostsByUserId(int page, int size, int blockSize) {
+        UserSession userSession = userService.getLoginUserInfo();
 
         if (userSession != null) {
             Paging paging = new Paging(page, size, blockSize, boardMapper.getTotalCnt());
@@ -129,8 +131,8 @@ public class BoardService {
         }
     }
 
-    public String updatePost(Integer bIdx, BoardRequest boardRequest, HttpServletRequest request) {
-        UserSession userSession = userService.getLoginUserInfo(request);
+    public String updatePost(Integer bIdx, BoardRequest boardRequest) {
+        UserSession userSession = userService.getLoginUserInfo();
         Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
 
         if (userSession != null ) {
@@ -146,9 +148,9 @@ public class BoardService {
         }
     }
 
-    public String deletePost(Integer bIdx, HttpServletRequest request) {
+    public String deletePost(Integer bIdx) {
 
-        UserSession userSession = userService.getLoginUserInfo(request);
+        UserSession userSession = userService.getLoginUserInfo();
         Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
 
         if (userSession != null ) {
@@ -161,9 +163,5 @@ public class BoardService {
         } else {
             throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
-    }
-
-    public BoardResponse searchPosts(String q) {
-        return boardMapper.searchPosts(q);
     }
 }
