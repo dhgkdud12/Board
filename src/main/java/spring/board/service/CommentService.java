@@ -3,8 +3,6 @@ package spring.board.service;
 import org.springframework.stereotype.Service;
 import spring.board.common.ErrorCode;
 import spring.board.common.TicketingException;
-import spring.board.dao.JdbcTemplate.JdbcBoardDao;
-import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.MyBatis.BoardMapper;
 import spring.board.dao.MyBatis.CommentMapper;
 import spring.board.domain.Comment;
@@ -23,14 +21,16 @@ import java.util.*;
 public class CommentService {
     private final BoardMapper boardMapper;
     private final CommentMapper commentMapper;
+    private final UserService userService;
 //    private final JdbcBoardDao boardDao;
 //    private final JdbcCommentDao commentDao;
 
-    public CommentService(BoardMapper boardMapper, CommentMapper commentMapper) {
+    public CommentService(BoardMapper boardMapper, CommentMapper commentMapper, UserService userService) {
         this.boardMapper = boardMapper;
         this.commentMapper = commentMapper;
 //        this.boardDao = boardDao;
 //        this.commentDao = commentDao;
+        this.userService = userService;
     }
 
     private CommentDto createCommentListDto(CommentResponse commentResponse) {
@@ -283,7 +283,7 @@ public class CommentService {
     public String post(Integer bIdx, CommentRequest commentRequest) throws Exception {
 //        HttpSession session = request.getSession();
 //        UserSession userSession = (UserSession) session.getAttribute("USER");
-        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
+        UserSession userSession = userService.getLoginUserInfo();
 
         if (boardMapper.selectPostByPostId(bIdx) == null) {
             throw new TicketingException(ErrorCode.INVALID_BOARD);
@@ -317,7 +317,7 @@ public class CommentService {
     // 댓글 삭제시 삭제된 댓글입니다로 변경
     public String delete(Integer cIdx) throws Exception { // 글이 존재하지 않을 경우
 //        UserSession userSession = userService.getLoginUserInfo(request);
-        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
+        UserSession userSession = userService.getLoginUserInfo();
         Integer c_uidx = commentMapper.selectCommentByCommentId(cIdx).getUserIdx();
 
         if (c_uidx == null) throw new TicketingException(ErrorCode.INVALID_COMMENT);
@@ -332,7 +332,7 @@ public class CommentService {
         return "댓글 삭제 실패";
     }
 
-    public List<CommentResponse> selectCommentsByUserId() throws Exception {
+    public List<CommentResponse> selectCommentsByUserId() {
 //        HttpSession session = request.getSession();
 //        UserSession userSession = (UserSession) session.getAttribute("USER");
         UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");

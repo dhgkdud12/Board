@@ -27,15 +27,15 @@ public class UserController {
 
     // 로그인
     @PostMapping ("/login")
-    public CommonResponse logIn(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
-        String message = userService.login(userLoginRequest, request);
+    public CommonResponse logIn(@RequestBody UserLoginRequest userLoginRequest) {
+        String message = userService.login(userLoginRequest);
         return new CommonResponse(ResponseStatus.SUCCESS, 200, message, null);
     }
     
     // 로그아웃
     @GetMapping("/logout")
-    public CommonResponse logout(HttpServletRequest request) {
-        String message = userService.logout(request);
+    public CommonResponse logout() {
+        String message = userService.logout();
         return new CommonResponse(ResponseStatus.SUCCESS, 200, message, null);
     }
 }
