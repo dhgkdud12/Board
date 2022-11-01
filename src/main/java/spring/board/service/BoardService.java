@@ -1,6 +1,8 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
+import spring.board.common.ErrorCode;
+import spring.board.common.TicketingException;
 import spring.board.dao.JdbcTemplate.JdbcBoardDao;
 import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.JdbcTemplate.JdbcFileDao;
@@ -13,7 +15,6 @@ import spring.board.dto.common.PageInfo;
 import spring.board.dto.file.FileRequest;
 import spring.board.dto.file.FileResponse;
 import spring.board.dto.user.UserSession;
-import spring.board.util.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -24,6 +25,7 @@ import java.util.*;
 @Service
 //@RequiredArgsConstructor
 public class BoardService {
+    private final UserService userService;
     private final FileService fileService;
     private final CommentService commentService;
     private final BoardMapper boardMapper;
@@ -32,7 +34,8 @@ public class BoardService {
     //    private final JdbcBoardDao boardDao;
 //    private final JdbcFileDao fileDao;
 
-    public BoardService(FileService fileService, CommentService commentService, BoardMapper boardMapper, FileMapper fileMapper) {
+    public BoardService(UserService userService, FileService fileService, CommentService commentService, JdbcBoardDao boardDao, JdbcFileDao fileDao, JdbcCommentDao commentDao, BoardMapper boardMapper, FileMapper fileMapper) {
+        this.userService = userService;
         this.fileService = fileService;
         this.commentService = commentService;
         this.fileMapper = fileMapper;
@@ -44,27 +47,23 @@ public class BoardService {
 
 
 
-    public String post(BoardRequest boardRequest, HttpServletRequest request) throws Exception {
-//        HttpSession session = request.getSession();
-//        UserSession userSession = (UserSession) session.getAttribute("USER");
-        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
+    public String post(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
+        HttpSession session = request.getSession();
+        UserSession userSession = (UserSession) session.getAttribute("USER");
 
         if (userSession != null) {
             Board board = new Board(null, boardRequest.getTitle(), boardRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), null);
 //            int bIdx = boardDao.insertPost(board);
             Integer bIdx = boardMapper.insertPost(board);
 
-            if (bIdx == null) {
-                return "게시물 작성 실패";
-            } else {
+            if (bIdx != null) {
                 if (boardRequest.getFile() != null) {
                     boardRequest.setId(bIdx);
                     fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
                 }
             }
         } else {
-            System.out.println("로그인을 먼저 해주세요.");
-            return "게시물 작성 실패";
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
         return "게시물 작성 완료";
     }
@@ -106,11 +105,15 @@ public class BoardService {
         return boardInfoResponse;
     }
 
+    public List<BoardResponse> selectPostAndCommentByPostId(Integer bIdx) {
+        BoardResponse boardResponse = new BoardResponse();
+        return null;
+    }
+
     // 내 게시물 - 사용자 검색
-    public List<BoardResponse> selectPostsByUserId(int page, int size, int blockSize) throws Exception {
-//        HttpSession session = request.getSession();
-//        UserSession userSession = (UserSession) session.getAttribute("USER");
-        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
+    public List<BoardResponse> selectPostsByUserId(int page, int size, int blockSize, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        UserSession userSession = (UserSession) session.getAttribute("USER");
 
         if (userSession != null) {
             Paging paging = new Paging(page, size, blockSize, boardMapper.getTotalCnt());
@@ -122,62 +125,45 @@ public class BoardService {
             List<BoardResponse> list = boardMapper.selectPostsByUserId(map);
             return list;
         } else {
-            System.out.println("로그인을 먼저 해주세요.");
-            return null;
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
     }
 
-    public String updatePost(Integer bIdx, BoardRequest boardRequest) throws Exception {
-//        UserSession userSession = userService.getLoginUserInfo(request);
-        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
+    public String updatePost(Integer bIdx, BoardRequest boardRequest, HttpServletRequest request) {
+        UserSession userSession = userService.getLoginUserInfo(request);
+        Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
 
-        // mybatis에서 본인 idx와 게시물 idx가 같으면
-        BoardResponse board = boardMapper.selectPostByPostId(bIdx);
-
-        if (board != null) {
-            Integer b_uidx = board.getUserIdx();
-
-            if (userSession != null ) {
-                if (b_uidx.equals(userSession.getIdx())) {
-                    Date now = new Date();
-                    BoardUpdateRequest boardUpdateRequest = new BoardUpdateRequest(bIdx, boardRequest.getTitle(), boardRequest.getContent(), new Date());
-                    boardMapper.updatePost(boardUpdateRequest);
-                    return "게시물 수정 완료";
-                } else {
-                    System.out.println("본인 게시물만 삭제 가능");
-                }
+        if (userSession != null ) {
+            if (b_uidx.equals(userSession.getIdx())) {
+                BoardUpdateRequest boardUpdateRequest = new BoardUpdateRequest(bIdx, boardRequest.getTitle(), boardRequest.getContent(), new Timestamp(new Date().getTime()));
+                boardMapper.updatePost(boardUpdateRequest);
+                return "게시물 수정 완료";
             } else {
-                System.out.println("사용자 로그인 정보 없음");
+                throw new TicketingException(ErrorCode.INVALID_USER);
             }
         } else {
-            System.out.println("게시물이 존재하지 않음");
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
-        return "게시물 수정 실패";
     }
 
-    public String deletePost(Integer bIdx) throws Exception {
+    public String deletePost(Integer bIdx, HttpServletRequest request) {
 
-        // MyBatis에서 본인의 idx와 idx가 같다면
-//        UserSession userSession = userService.getLoginUserInfo(request);
-        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
-        BoardResponse board = boardMapper.selectPostByPostId(bIdx);
+        UserSession userSession = userService.getLoginUserInfo(request);
+        Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
 
-        if (board != null) {
-            Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
-
-            if (userSession != null ) {
-                if (b_uidx.equals(userSession.getIdx())) {
-                    boardMapper.deletePost(bIdx);
-                    return "게시물 삭제 완료";
-                } else {
-                    System.out.println("본인 게시물만 삭제 가능");
-                }
+        if (userSession != null ) {
+            if (b_uidx.equals(userSession.getIdx())) {
+                boardMapper.deletePost(bIdx);
+                return "게시물 삭제 완료";
             } else {
-                System.out.println("사용자 로그인 정보 없음");
+                throw new TicketingException(ErrorCode.INVALID_USER);
             }
         } else {
-            System.out.println("게시물이 존재하지 않음");
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
-        return "게시물 삭제 실패";
+    }
+
+    public BoardResponse searchPosts(String q) {
+        return boardMapper.searchPosts(q);
     }
 }

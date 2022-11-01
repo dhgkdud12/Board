@@ -1,6 +1,8 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
+import spring.board.common.ErrorCode;
+import spring.board.common.TicketingException;
 import spring.board.dao.JdbcTemplate.JdbcBoardDao;
 import spring.board.dao.JdbcTemplate.JdbcCommentDao;
 import spring.board.dao.MyBatis.BoardMapper;
@@ -283,7 +285,9 @@ public class CommentService {
 //        UserSession userSession = (UserSession) session.getAttribute("USER");
         UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
 
-        if (boardMapper.selectPostByPostId(bIdx) == null) System.out.println("게시물이 존재하지 않음");
+        if (boardMapper.selectPostByPostId(bIdx) == null) {
+            throw new TicketingException(ErrorCode.INVALID_BOARD);
+        }
         else if (userSession != null) {
             Comment comment = null;
             if (commentRequest.getParentId() == null) {
@@ -292,8 +296,7 @@ public class CommentService {
 
             } else {
                 if (commentMapper.selectCommentByCommentId(commentRequest.getParentId()) == null) {
-                    System.out.println("답글달 댓글이 존재하지 않음");
-                    return "댓글 작성 실패";
+                    throw new TicketingException(ErrorCode.INVALID_COMMENT);
                 }
                 // 부모 댓글이 해당 게시글의 댓글이 아닐 경우
                 comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), commentRequest.getParentId(), null, 0, 0, 0);
@@ -307,9 +310,8 @@ public class CommentService {
             return "댓글 작성 완료";
 
         } else {
-            System.out.println("로그인을 먼저 해주세요.");
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
-        return "댓글 작성 실패";
     }
 
     // 댓글 삭제시 삭제된 댓글입니다로 변경
@@ -318,16 +320,14 @@ public class CommentService {
         UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
         Integer c_uidx = commentMapper.selectCommentByCommentId(cIdx).getUserIdx();
 
-        if (c_uidx == null) System.out.println("댓글이 존재하지 않음");
+        if (c_uidx == null) throw new TicketingException(ErrorCode.INVALID_COMMENT);
         else if (userSession != null ) {
             if (c_uidx.equals(userSession.getIdx())) {
                 commentMapper.deleteComment(cIdx);
                 return "댓글 삭제 완료";
             } else {
-                System.out.println("본인 댓글만 삭제 가능");
+                throw new TicketingException(ErrorCode.INVALID_USER);
             }
-        } else {
-            System.out.println("로그인 후 본인 댓글만 작성 가능");
         }
         return "댓글 삭제 실패";
     }

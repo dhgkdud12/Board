@@ -1,11 +1,13 @@
 package spring.board.dto.board;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import spring.board.domain.Paging;
 
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
 public class BoardSearchRequest extends Paging {
     private String searchType;
