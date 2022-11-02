@@ -1,13 +1,13 @@
 package spring.board.controller;
 
 import org.springframework.web.bind.annotation.*;
-import spring.board.domain.response.CommonResponse;
-import spring.board.domain.response.ResponseStatus;
+import spring.board.common.response.CommonResponse;
+import spring.board.common.response.ResponseStatus;
 import spring.board.dto.user.UserLoginRequest;
 import spring.board.dto.user.UserRequest;
 import spring.board.service.UserService;
-import javax.servlet.http.HttpServletRequest;
 
+import javax.validation.Valid;
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -20,7 +20,8 @@ public class UserController {
 
     // 회원가입
     @PostMapping("")
-    public CommonResponse register(@RequestBody UserRequest userRequest) throws Exception {
+    public CommonResponse register(@Valid @RequestBody UserRequest userRequest) {
+
         String message = userService.register(userRequest);
         return new CommonResponse(ResponseStatus.SUCCESS, 200, message, null);
     }

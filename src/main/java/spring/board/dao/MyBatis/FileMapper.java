@@ -6,11 +6,11 @@ import spring.board.domain.FileEntity;
 
 @Mapper
 public interface FileMapper {
-    public int insertFile(FileEntity file);
+    int insertFile(FileEntity file);
 
-    public FileRequest selectFile(Integer fIdx);
+    FileRequest selectFile(Integer fIdx);
 
-    public FileRequest selectFileByBoardId(Integer bIdx);
+    FileRequest selectFileByBoardId(Integer bIdx);
 
 
 }

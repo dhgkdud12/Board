@@ -7,6 +7,9 @@
     <insert id="insertPost" parameterType="spring.board.domain.Board">
         INSERT INTO board (title, content, user_idx, create_date, update_date)
         VALUES (#{title}, #{content}, #{userIdx}, #{createDate}, #{updateDate})
+        <selectKey keyProperty="boardNo" resultType="Integer">
+            SELECT LAST_INSERT_ID() AS board_no;
+        </selectKey>
     </insert>
 
     <select id="selectPostByPostId" parameterType="Integer" resultType="spring.board.dto.board.BoardResponse">

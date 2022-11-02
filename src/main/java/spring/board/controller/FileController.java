@@ -5,30 +5,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import spring.board.domain.response.CommonResponse;
-import spring.board.domain.response.ResponseStatus;
-import spring.board.service.FileService;
-
-import java.io.IOException;
+import spring.board.common.response.exception.ErrorCode;
+import spring.board.common.response.exception.TicketingException;
+import spring.board.common.response.CommonResponse;
+import spring.board.common.response.ResponseStatus;
+import spring.board.common.response.SuccessMessage;
+import spring.board.service.file.FTPFileService;
 
 @RestController
 @RequestMapping("/file")
 public class FileController {
-    private final FileService fileService;
+    private final FTPFileService fileService;
 
-    public FileController(FileService fileService) {
+    public FileController(FTPFileService fileService) {
         this.fileService = fileService;
     }
 
     // 파일 다운로드
     @GetMapping("/download/{fIdx}")
-    public CommonResponse download(@PathVariable("fIdx") Integer fIdx) throws IOException {
+    public CommonResponse download(@PathVariable("fIdx") Integer fIdx) {
         ResponseEntity<Object> entity = fileService.downloadFilefromFTP(fIdx);
         if (entity.getStatusCode().value() == 200) {
-            return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "파일 다운로드 성공", entity);
+            return new CommonResponse<>(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_FILE_DOWN.getMessage(), entity);
         }
         else
-            return new CommonResponse<>(ResponseStatus.FAILURE, 200, "파일 다운로드 실패", entity);
+            throw new TicketingException(ErrorCode.FAIL_FILE_DOWN);
     }
-
 }

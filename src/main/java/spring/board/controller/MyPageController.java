@@ -4,13 +4,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import spring.board.domain.response.CommonResponse;
-import spring.board.domain.response.ResponseStatus;
+import spring.board.common.response.CommonResponse;
+import spring.board.common.response.SuccessMessage;
+import spring.board.common.response.ResponseStatus;
 import spring.board.dto.comment.CommentResponse;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +37,14 @@ public class MyPageController {
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("boardInfo", boardService.selectPostsByUserId(page, size, blockSize));
         resultMap.put("pageInfo", boardService.getPagingInfo(page, size, blockSize));
-        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "게시물 조회 완료", resultMap);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_READ.getMessage(), resultMap);
     }
     
     // 내가 작성한 댓글
     @GetMapping("/comments")
     public CommonResponse myComments() throws Exception {
         List<CommentResponse> comments = commentService.selectCommentsByUserId();
-        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "댓글 조회 완료", comments);
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_READ.getMessage(), comments);
     }
 
 }

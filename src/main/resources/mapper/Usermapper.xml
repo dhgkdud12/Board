@@ -12,6 +12,10 @@
         SELECT COUNT(*) FROM user WHERE id = #{id}
     </select>
 
+    <select id="selectUserEmail" parameterType="String" resultType="Integer">
+        SELECT COUNT(*) FROM user WHERE email = #{email}
+    </select>
+
     <insert id="insertUser" parameterType="spring.board.dto.user.UserRequest">
         INSERT INTO user(id, name, password, email)
         VALUES (#{id}, #{name}, #{password}, #{email})
