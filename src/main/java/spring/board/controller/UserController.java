@@ -7,6 +7,7 @@ import spring.board.dto.user.UserLoginRequest;
 import spring.board.dto.user.UserRequest;
 import spring.board.service.UserService;
 
+import javax.validation.Valid;
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -19,7 +20,8 @@ public class UserController {
 
     // 회원가입
     @PostMapping("")
-    public CommonResponse register(@RequestBody UserRequest userRequest) throws Exception {
+    public CommonResponse register(@Valid @RequestBody UserRequest userRequest) {
+
         String message = userService.register(userRequest);
         return new CommonResponse(ResponseStatus.SUCCESS, 200, message, null);
     }

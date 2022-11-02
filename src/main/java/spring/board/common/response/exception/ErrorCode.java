@@ -30,8 +30,8 @@ public enum ErrorCode {
     // 4000 FAIL
     FAIL_SESSION_CRATE(4000, "세션 생성에 실패하였습니다."),
     FAIL_FILE_UP(4001, "파일 업로드에 실패하였습니다."),
-    FAIL_FILE_DOWN(4002, "파일 다운로드에 실패하였습니다.");
-
+    FAIL_FILE_DOWN(4002, "파일 다운로드에 실패하였습니다."),
+    FAIL_VALIDATION(4003, "유효성 검사에 실패하였습니다.");
 
     private final int code;
     private final String message;

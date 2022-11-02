@@ -28,4 +28,11 @@ public class CommonResponse<T> {
         this.code = errorCode;
         this.message = errorMessage;
     }
+
+    public CommonResponse(int errorCode, String errorMessage, T data) {
+        this.status = ResponseStatus.FAILURE;
+        this.code = errorCode;
+        this.message = errorMessage;
+        this.data = data;
+    }
 }
