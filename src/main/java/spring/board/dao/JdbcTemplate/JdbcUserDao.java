@@ -23,7 +23,6 @@ public class JdbcUserDao {
                 "VALUES (?, ?, ?, ?)" ;
         jdbcTemplate.update(query, userRequest.getName(), userRequest.getId(), userRequest.getPassword(), userRequest.getEmail());
     }
-
     // 사용자 정보 가져오기
     public User selectUser(String id) {
         String query = "SELECT * FROM user WHERE id = ?";
@@ -42,7 +41,8 @@ public class JdbcUserDao {
                     rs.getString("id"),
                     rs.getString("name"),
                     rs.getString("password"),
-                    rs.getString("email")
+                    rs.getString("email"),
+                    rs.getTimestamp("join_date")
             );
         }
     }

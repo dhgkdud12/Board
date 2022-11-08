@@ -1,6 +1,7 @@
 package spring.board.controller;
 
 import org.springframework.http.MediaType;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import spring.board.common.response.CommonResponse;
 import spring.board.common.response.SuccessMessage;
@@ -15,6 +16,7 @@ import spring.board.service.CommentService;
 import spring.board.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +58,7 @@ public class BoardController {
 
     // 게시물 작성
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public CommonResponse post(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
+    public CommonResponse post(@Valid BoardRequest boardRequest, HttpServletRequest request) {
         String message = boardService.post(boardRequest, request);
         return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
     }
@@ -71,7 +73,7 @@ public class BoardController {
     // 게시물 수정
     // 내가 작성한 게시물만 수정 가능
     @PutMapping("/{bIdx}")
-    public CommonResponse updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardRequest boardRequest) {
+    public CommonResponse updatePost(@PathVariable("bIdx") Integer bIdx, @Valid @RequestBody BoardRequest boardRequest) {
         String message = boardService.updatePost(bIdx, boardRequest);
         return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
     }
@@ -86,7 +88,7 @@ public class BoardController {
 
     // 댓글 작성
     @PostMapping("/{bIdx}")
-    public CommonResponse postComment(@PathVariable("bIdx") Integer bIdx, @RequestBody CommentRequest commentRequest) throws Exception {
+    public CommonResponse postComment(@PathVariable("bIdx") Integer bIdx, @Valid @RequestBody CommentRequest commentRequest) throws Exception {
         String message = commentService.post(bIdx, commentRequest);
         return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
     }
