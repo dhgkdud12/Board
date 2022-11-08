@@ -40,7 +40,8 @@ public class UserService {
         userRequest.setPassword(hashPassword);
 
 //        userDao.insertUser(userRequest);
-        userMapper.insertUser(userRequest);
+        User user = new User(userRequest);
+        userMapper.insertUser(user);
         return SuccessMessage.SUCCESS_REGISTER.getMessage();
     }
 

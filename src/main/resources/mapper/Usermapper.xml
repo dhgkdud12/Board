@@ -16,8 +16,8 @@
         SELECT COUNT(*) FROM user WHERE email = #{email}
     </select>
 
-    <insert id="insertUser" parameterType="spring.board.dto.user.UserRequest">
-        INSERT INTO user(id, name, password, email)
-        VALUES (#{id}, #{name}, #{password}, #{email})
+    <insert id="insertUser" parameterType="spring.board.domain.User">
+        INSERT INTO user(id, name, password, email, join_date)
+        VALUES (#{id}, #{name}, #{password}, #{email}, #{joinDate})
     </insert>
 </mapper>

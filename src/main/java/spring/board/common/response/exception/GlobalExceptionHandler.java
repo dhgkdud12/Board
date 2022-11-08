@@ -1,5 +1,6 @@
 package spring.board.common.response.exception;
 
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -37,13 +38,27 @@ public class GlobalExceptionHandler {
 
     // 유효성 검사 예외처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public CommonResponse handleValidationExceptions(MethodArgumentNotValidException exception) {
+    public CommonResponse errorValid(MethodArgumentNotValidException exception) {
         BindingResult bindingResult = exception.getBindingResult();
 
         Map<String, String> errors = new HashMap<>();
         for (ObjectError result : bindingResult.getAllErrors()) {
             errors.put(
                     ((FieldError)result).getField(), // id, password 등 객체
+                    result.getDefaultMessage());
+        }
+        ErrorCode error = ErrorCode.FAIL_VALIDATION;
+        return new CommonResponse(error.getCode(), error.getMessage(), errors);
+    }
+
+    @ExceptionHandler(BindException.class)
+    public CommonResponse errorArgumentValid(BindException exception) {
+        BindingResult bindingResult = exception.getBindingResult();
+
+        Map<String, String> errors = new HashMap<>();
+        for (ObjectError result : bindingResult.getAllErrors()) {
+            errors.put(
+                    ((FieldError)result).getField(),
                     result.getDefaultMessage());
         }
         ErrorCode error = ErrorCode.FAIL_VALIDATION;

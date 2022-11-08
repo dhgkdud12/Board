@@ -46,7 +46,7 @@ public class BoardService {
 
     }
 
-    public String post(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
+    public String post(BoardRequest boardRequest, HttpServletRequest request) {
 //        HttpSession session = request.getSession();
 //        UserSession userSession = (UserSession) session.getAttribute("USER");
 
@@ -60,7 +60,11 @@ public class BoardService {
 
             Integer bIdx = boardRequest.getBId();
             if (boardRequest.getFile() != null) {
-                fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
+                try {
+                    fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         } else {
             throw new TicketingException(ErrorCode.INVALID_LOGIN);
@@ -91,13 +95,13 @@ public class BoardService {
         else fileResponse = new FileResponse(file.getFileNo(), file.getFileName(), file.getPath());
 //        return new BoardInfoResponse(boardDao.selectPostNByPostId(bIdx), fileResponse, commentService.selectCommentsByPostId(bIdx));
 
-        BoardInfoResponse boardInfoResponse =
+        BoardInfoResponse boardInfo =
                 new BoardInfoResponse(
                         boardMapper.selectPostByPostId(bIdx),
                         fileResponse,
                         commentService.selectCommentsByPostId(bIdx));
 
-        return boardInfoResponse;
+        return boardInfo;
     }
 
     // 내 게시물 - 사용자 검색
