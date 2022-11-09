@@ -42,7 +42,7 @@ public class MyPageController {
     
     // 내가 작성한 댓글
     @GetMapping("/comments")
-    public CommonResponse myComments() throws Exception {
+    public CommonResponse myComments() {
         List<CommentResponse> comments = commentService.selectCommentsByUserId();
         return new CommonResponse<>(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_READ.getMessage(), comments);
     }

@@ -14,6 +14,7 @@ public class CommonResponse<T> {
     private int code;
     private String message;
     private T data;
+    private T error;
 
 
     public CommonResponse(ResponseStatus status, int code, String message, T data) {
@@ -29,10 +30,10 @@ public class CommonResponse<T> {
         this.message = errorMessage;
     }
 
-    public CommonResponse(int errorCode, String errorMessage, T data) {
+    public CommonResponse(int errorCode, String errorMessage, T error) {
         this.status = ResponseStatus.FAILURE;
         this.code = errorCode;
         this.message = errorMessage;
-        this.data = data;
+        this.error = error;
     }
 }

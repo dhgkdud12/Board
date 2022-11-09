@@ -23,7 +23,7 @@ public class FileController {
 
     // 파일 다운로드
     @GetMapping("/download/{fIdx}")
-    public CommonResponse download(@PathVariable("fIdx") Integer fIdx) {
+    public CommonResponse download(@PathVariable("fIdx") int fIdx) {
         ResponseEntity<Object> entity = fileService.downloadFilefromFTP(fIdx);
         if (entity.getStatusCode().value() == 200) {
             return new CommonResponse<>(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_FILE_DOWN.getMessage(), entity);

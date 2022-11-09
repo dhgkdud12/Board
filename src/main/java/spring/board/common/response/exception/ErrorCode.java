@@ -18,8 +18,8 @@ public enum ErrorCode {
 
     // 2000 DUPLICATE
     DUPLICATE_ID(2000, "이미 해당 ID가 존재합니다."),
-    DUPLICATE_EMAIL(2000, "이미 해당 이메일이 존재합니다."),
-    DUPLICATE_LOGIN(2001, "이미 로그인중입니다."),
+    DUPLICATE_EMAIL(2001, "이미 해당 이메일이 존재합니다."),
+    DUPLICATE_LOGIN(2002, "이미 로그인중입니다."),
 
 
     // 3000 MISMATCH

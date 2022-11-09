@@ -21,16 +21,13 @@ public class UserController {
     // 회원가입
     @PostMapping("")
     public CommonResponse register(@Valid @RequestBody UserRequest userRequest) {
-
-        String message = userService.register(userRequest);
-        return new CommonResponse(ResponseStatus.SUCCESS, 200, message, null);
+        return userService.register(userRequest);
     }
 
     // 로그인
     @PostMapping ("/login")
     public CommonResponse logIn(@RequestBody UserLoginRequest userLoginRequest) {
-        String message = userService.login(userLoginRequest);
-        return new CommonResponse(ResponseStatus.SUCCESS, 200, message, null);
+        return userService.login(userLoginRequest);
     }
     
     // 로그아웃

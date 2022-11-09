@@ -15,7 +15,7 @@ import spring.board.service.CommentService;
 import spring.board.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +56,8 @@ public class BoardController {
 
     // 게시물 작성
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public CommonResponse post(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
-        String message = boardService.post(boardRequest, request);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
+    public CommonResponse post(@Valid BoardRequest boardRequest, HttpServletRequest request) {
+        return boardService.post(boardRequest, request);
     }
 
     @GetMapping("/{bIdx}")
@@ -71,37 +70,31 @@ public class BoardController {
     // 게시물 수정
     // 내가 작성한 게시물만 수정 가능
     @PutMapping("/{bIdx}")
-    public CommonResponse updatePost(@PathVariable("bIdx") Integer bIdx, @RequestBody BoardRequest boardRequest) {
-        String message = boardService.updatePost(bIdx, boardRequest);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
+    public CommonResponse updatePost(@PathVariable("bIdx") int bIdx, @Valid @RequestBody BoardRequest boardRequest) {
+        return boardService.updatePost(bIdx, boardRequest);
     }
     
     // 게시물 삭제
     // 내가 삭제한 게시물만 삭제 가능
     @DeleteMapping("/{bIdx}")
-    public CommonResponse deletePost(@PathVariable("bIdx")Integer bIdx) {
-        String message = boardService.deletePost(bIdx);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
+    public CommonResponse deletePost(@PathVariable("bIdx") int bIdx) {
+        return boardService.deletePost(bIdx);
     }
 
     // 댓글 작성
     @PostMapping("/{bIdx}")
-    public CommonResponse postComment(@PathVariable("bIdx") Integer bIdx, @RequestBody CommentRequest commentRequest) throws Exception {
-        String message = commentService.post(bIdx, commentRequest);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null);
+    public CommonResponse postComment(@PathVariable("bIdx") int bIdx, @Valid @RequestBody CommentRequest commentRequest) throws Exception {
+        return commentService.post(bIdx, commentRequest);
     }
 
     @GetMapping("/{bIdx}/comment")
-    public CommonResponse selectComment(@PathVariable("bIdx") Integer bIdx) {
+    public CommonResponse selectComment(@PathVariable("bIdx") int bIdx) {
         List<CommentDto> comments = commentService.selectCommentsByPostId(bIdx);
         return new CommonResponse<>(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_READ.getMessage(), comments);
     }
 
     @DeleteMapping("/{bIdx}/comment/{cIdx}")
-    public CommonResponse deleteComment(@PathVariable("bIdx") Integer bIdx, @PathVariable("cIdx") Integer cIdx) throws Exception {
-        String message = commentService.delete(cIdx);
-        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, message, null
-        );
+    public CommonResponse deleteComment(@PathVariable("bIdx") int bIdx, @PathVariable("cIdx") int cIdx) throws Exception {
+        return commentService.delete(cIdx);
     }
-
 }

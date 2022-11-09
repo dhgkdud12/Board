@@ -1,6 +1,8 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
+import spring.board.common.response.CommonResponse;
+import spring.board.common.response.ResponseStatus;
 import spring.board.common.response.exception.ErrorCode;
 import spring.board.common.response.exception.TicketingException;
 import spring.board.common.response.SuccessMessage;
@@ -281,7 +283,7 @@ public class CommentService {
         return childList;
     }
 
-    public String post(Integer bIdx, CommentRequest commentRequest) throws Exception {
+    public CommonResponse post(Integer bIdx, CommentRequest commentRequest) throws Exception {
 //        HttpSession session = request.getSession();
 //        UserSession userSession = (UserSession) session.getAttribute("USER");
         UserSession userSession = userService.getLoginUserInfo();
@@ -289,7 +291,9 @@ public class CommentService {
         if (boardMapper.selectPostByPostId(bIdx) == null) {
             throw new TicketingException(ErrorCode.INVALID_BOARD);
         }
-        else if (userSession != null) {
+        else if (userSession == null) {
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
+        } else {
             Comment comment = null;
             if (commentRequest.getParentId() == null) {
                 comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), null, null, 0, 0, 0);
@@ -308,30 +312,28 @@ public class CommentService {
 //            comment = new Comment(null, bIdx, commentRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), commentRequest.getParentId(), null, 0, 0, 0);
 //            jdbcCommentDao.insertComment(comment);
 
-            return "댓글 " + SuccessMessage.SUCCESS_CREATE.getMessage();
-        } else {
-            throw new TicketingException(ErrorCode.INVALID_LOGIN);
+            return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "댓글 " + SuccessMessage.SUCCESS_CREATE.getMessage(), null);
         }
     }
 
     // 댓글 삭제시 삭제된 댓글입니다로 변경
-    public String delete(Integer cIdx) throws Exception {
+    public CommonResponse delete(Integer cIdx) throws Exception {
 //        UserSession userSession = userService.getLoginUserInfo(request);
         UserSession userSession = userService.getLoginUserInfo();
         Integer c_uidx = commentMapper.selectCommentByCommentId(cIdx).getUserIdx();
 
         if (c_uidx == null) throw new TicketingException(ErrorCode.INVALID_COMMENT);
         else {
-            if (userSession != null) {
-                if (c_uidx.equals(userSession.getIdx())) {
-                    commentMapper.deleteComment(cIdx);
-                    return "댓글 " + SuccessMessage.SUCCESS_DELETE.getMessage();
-                } else {
-                    throw new TicketingException(ErrorCode.INVALID_USER);
-                }
+            if (userSession == null) {
+                throw new TicketingException(ErrorCode.INVALID_LOGIN);
             }
             else {
-                throw new TicketingException(ErrorCode.INVALID_LOGIN);
+                if (!c_uidx.equals(userSession.getIdx())) {
+                    throw new TicketingException(ErrorCode.INVALID_USER);
+                } else {
+                    commentMapper.deleteComment(cIdx);
+                    return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "댓글 " + SuccessMessage.SUCCESS_DELETE.getMessage(), null);
+                }
             }
         }
     }

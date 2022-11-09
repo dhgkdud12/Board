@@ -11,5 +11,5 @@ public interface UserMapper {
     User selectUser(String id);
     Integer selectUserId(String id);
     Integer selectUserEmail(String email);
-    void insertUser(UserRequest userRequest);
+    void insertUser(User user);
 }
