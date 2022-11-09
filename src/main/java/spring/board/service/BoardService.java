@@ -1,6 +1,8 @@
 package spring.board.service;
 
 import org.springframework.stereotype.Service;
+import spring.board.common.response.CommonResponse;
+import spring.board.common.response.ResponseStatus;
 import spring.board.common.response.exception.ErrorCode;
 import spring.board.common.response.exception.TicketingException;
 import spring.board.common.response.SuccessMessage;
@@ -46,7 +48,7 @@ public class BoardService {
 
     }
 
-    public String post(BoardRequest boardRequest, HttpServletRequest request) {
+    public CommonResponse post(BoardRequest boardRequest, HttpServletRequest request) {
 //        HttpSession session = request.getSession();
 //        UserSession userSession = (UserSession) session.getAttribute("USER");
 
@@ -69,7 +71,7 @@ public class BoardService {
         } else {
             throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
-        return "게시물 " + SuccessMessage.SUCCESS_CREATE.getMessage();
+        return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "게시물 " + SuccessMessage.SUCCESS_CREATE.getMessage(), null);
     }
 
     // 페이지
@@ -92,7 +94,7 @@ public class BoardService {
         FileRequest file = fileMapper.selectFileByBoardId(bIdx);
         FileResponse fileResponse;
         if (file == null) fileResponse = null;
-        else fileResponse = new FileResponse(file.getFileNo(), file.getFileName(), file.getPath());
+        else fileResponse = new FileResponse(file.getFileNo(), file.getFileName(), file.getPath()); // null
 //        return new BoardInfoResponse(boardDao.selectPostNByPostId(bIdx), fileResponse, commentService.selectCommentsByPostId(bIdx));
 
         BoardInfoResponse boardInfo =
@@ -122,7 +124,7 @@ public class BoardService {
         }
     }
 
-    public String updatePost(Integer bIdx, BoardRequest boardRequest) {
+    public CommonResponse updatePost(int bIdx, BoardRequest boardRequest) {
         UserSession userSession = userService.getLoginUserInfo();
 
         if (boardMapper.selectPostByPostId(bIdx) == null) {
@@ -131,20 +133,20 @@ public class BoardService {
 
         Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
 
-        if (userSession != null ) {
-            if (b_uidx.equals(userSession.getIdx())) {
+        if (userSession == null ) {
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
+        } else {
+            if (!b_uidx.equals(userSession.getIdx())) {
+                throw new TicketingException(ErrorCode.INVALID_USER);
+            } else {
                 BoardUpdateRequest boardUpdateRequest = new BoardUpdateRequest(bIdx, boardRequest.getTitle(), boardRequest.getContent(), new Timestamp(new Date().getTime()));
                 boardMapper.updatePost(boardUpdateRequest);
-                return "게시물 " + SuccessMessage.SUCCESS_UPDATE.getMessage();
-            } else {
-                throw new TicketingException(ErrorCode.INVALID_USER);
+                return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "게시물 " + SuccessMessage.SUCCESS_UPDATE.getMessage(), null);
             }
-        } else {
-            throw new TicketingException(ErrorCode.INVALID_LOGIN);
         }
     }
 
-    public String deletePost(Integer bIdx) {
+    public CommonResponse deletePost(int bIdx) {
 
         UserSession userSession = userService.getLoginUserInfo();
 
@@ -154,15 +156,16 @@ public class BoardService {
 
         Integer b_uidx = boardMapper.selectPostByPostId(bIdx).getUserIdx();
 
-        if (userSession != null ) {
-            if (b_uidx.equals(userSession.getIdx())) {
-                boardMapper.deletePost(bIdx);
-                return "게시물 " + SuccessMessage.SUCCESS_DELETE.getMessage();
-            } else {
-                throw new TicketingException(ErrorCode.INVALID_USER);
-            }
-        } else {
+        if (userSession == null ) {
             throw new TicketingException(ErrorCode.INVALID_LOGIN);
+        }
+        else {
+            if (!b_uidx.equals(userSession.getIdx())) {
+                throw new TicketingException(ErrorCode.INVALID_USER);
+            } else {
+                boardMapper.deletePost(bIdx);
+                return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "게시물 " + SuccessMessage.SUCCESS_DELETE.getMessage(), null);
+            }
         }
     }
 }

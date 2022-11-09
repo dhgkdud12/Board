@@ -2,6 +2,8 @@ package spring.board.service;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import spring.board.common.response.CommonResponse;
+import spring.board.common.response.ResponseStatus;
 import spring.board.common.response.exception.ErrorCode;
 import spring.board.common.response.exception.TicketingException;
 import spring.board.common.response.SuccessMessage;
@@ -26,7 +28,7 @@ public class UserService {
     }
 
 
-    public String register(UserRequest userRequest) {
+    public CommonResponse register(UserRequest userRequest) {
 
         if (userMapper.selectUserId(userRequest.getId()) == 1) {
             throw new TicketingException(ErrorCode.DUPLICATE_ID);
@@ -42,10 +44,11 @@ public class UserService {
 //        userDao.insertUser(userRequest);
         User user = new User(userRequest);
         userMapper.insertUser(user);
-        return SuccessMessage.SUCCESS_REGISTER.getMessage();
+        return new CommonResponse(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_REGISTER.getMessage(), null);
+
     }
 
-    public String login(UserLoginRequest userLoginRequest) {
+    public CommonResponse login(UserLoginRequest userLoginRequest) {
 
         UserSession userSession = getLoginUserInfo();
         if (userSession != null) {
@@ -58,13 +61,14 @@ public class UserService {
         if (loginUser == null) {
             throw new TicketingException(ErrorCode.MISMATCH_ID);
         } else {
-            if (BCrypt.checkpw(userLoginRequest.getPassword(), loginUser.getPassword())){
+            if (!BCrypt.checkpw(userLoginRequest.getPassword(), loginUser.getPassword())){
+                throw new TicketingException(ErrorCode.MISMATCH_PASSWORD);
+            } else {
                 if (createUserSession(loginUser) == null) {
                     throw new TicketingException(ErrorCode.FAIL_SESSION_CRATE);
                 }
-                return SuccessMessage.SUCCESS_LOGIN.getMessage();
-            } else {
-                throw new TicketingException(ErrorCode.MISMATCH_PASSWORD);
+                return new CommonResponse(ResponseStatus.SUCCESS, 200, SuccessMessage.SUCCESS_LOGIN.getMessage(), null);
+
             }
         }
     }
