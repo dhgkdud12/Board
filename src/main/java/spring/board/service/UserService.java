@@ -50,7 +50,7 @@ public class UserService {
 
     public CommonResponse login(UserLoginRequest userLoginRequest) {
 
-        UserSession userSession = getLoginUserInfo();
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
         if (userSession != null) {
             throw new TicketingException(ErrorCode.DUPLICATE_LOGIN);
         }

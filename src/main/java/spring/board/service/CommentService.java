@@ -286,7 +286,7 @@ public class CommentService {
     public CommonResponse post(Integer bIdx, CommentRequest commentRequest) throws Exception {
 //        HttpSession session = request.getSession();
 //        UserSession userSession = (UserSession) session.getAttribute("USER");
-        UserSession userSession = userService.getLoginUserInfo();
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
 
         if (boardMapper.selectPostByPostId(bIdx) == null) {
             throw new TicketingException(ErrorCode.INVALID_BOARD);
@@ -319,7 +319,7 @@ public class CommentService {
     // 댓글 삭제시 삭제된 댓글입니다로 변경
     public CommonResponse delete(Integer cIdx) throws Exception {
 //        UserSession userSession = userService.getLoginUserInfo(request);
-        UserSession userSession = userService.getLoginUserInfo();
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
         Integer c_uidx = commentMapper.selectCommentByCommentId(cIdx).getUserIdx();
 
         if (c_uidx == null) throw new TicketingException(ErrorCode.INVALID_COMMENT);

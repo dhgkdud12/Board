@@ -2,13 +2,12 @@ package spring.board.util;
 
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
-import spring.board.dto.user.UserSession;
 
 public class SessionUtils {
 
     // 세션 속성 값 가져오기
     public static Object getAttribute(String name) {
-        return (Object) RequestContextHolder.getRequestAttributes().getAttribute(name, RequestAttributes.SCOPE_SESSION);
+        return RequestContextHolder.getRequestAttributes().getAttribute(name, RequestAttributes.SCOPE_SESSION);
     }
 
     // 세션 정보 설정

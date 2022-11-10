@@ -13,6 +13,7 @@ import spring.board.dto.user.UserSession;
 import spring.board.service.BoardService;
 import spring.board.service.CommentService;
 import spring.board.service.UserService;
+import spring.board.util.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -24,12 +25,10 @@ import java.util.Map;
 @RequestMapping("board")
 public class BoardController {
     private final BoardService boardService;
-    private final UserService userService;
     private final CommentService commentService;
 
-    public BoardController(BoardService boardService, UserService userService, CommentService commentService) {
+    public BoardController(BoardService boardService, CommentService commentService) {
         this.boardService = boardService;
-        this.userService = userService;
         this.commentService = commentService;
     }
 
@@ -42,7 +41,7 @@ public class BoardController {
             @RequestParam(name = "searchType", required = false, defaultValue = "title") String searchType,
             @RequestParam(name = "keyword", required = false) String keyword) {
         Map<String, Object> resultMap = new HashMap<>();
-        UserSession userSession = userService.getLoginUserInfo();
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
         if (userSession != null) {
             System.out.println(userSession.getName()+"님 로그인중");
         }

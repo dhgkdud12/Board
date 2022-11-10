@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import spring.board.common.response.exception.TicketingException;
 import spring.board.common.response.exception.ErrorCode;
 import spring.board.common.response.SuccessMessage;
@@ -35,10 +36,12 @@ public class FTPFileService {
     }
 
 
-    public String uploadFiletoFtp(BoardRequest boardRequest, HttpServletRequest request) throws IOException {
+    public String uploadFiletoFtp(BoardRequest boardRequest) throws IOException {
+
+        MultipartFile file = boardRequest.getFile();
 
         // 원본 파일명, 확장자
-        String fileName = boardRequest.getFile().getOriginalFilename();
+        String fileName = file.getOriginalFilename();
         int idx = fileName.indexOf(".");
         String onlyFName = fileName.substring(0, idx);
         String fileE = fileName.substring(idx+1);
@@ -53,7 +56,7 @@ public class FTPFileService {
         String fullPath = filePath+convertName+"."+fileE;
 
         // 파일 크기
-        long fileSize = boardRequest.getFile().getSize();
+        long fileSize = file.getSize();
 
         FTPClient ftpClient = new FTPClient();
         try {
@@ -72,7 +75,7 @@ public class FTPFileService {
                 ftpClient.enterLocalPassiveMode(); // passive 모드
                 ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-                boolean isSuccess = ftpClient.storeFile(fullPath, boardRequest.getFile().getInputStream()); // 파일 저장
+                boolean isSuccess = ftpClient.storeFile(fullPath, file.getInputStream()); // 파일 저장
                 if (isSuccess) {
                     System.out.println("업로드 성공");
                 }
@@ -82,11 +85,6 @@ public class FTPFileService {
             throw new TicketingException(ErrorCode.INVALID_FILE);
         } catch (SocketException e){
             System.out.println("소켓 오류");
-        }
-        finally {
-            if (request.getInputStream() != null) {
-                request.getInputStream().close();
-            }
         }
 
         ftpClient.disconnect(); // 연결 해제
