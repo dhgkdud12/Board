@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.board.dao.MyBatis.RmcOutMapper">
+    <insert id="insertRmcOut" parameterType="spring.board.API.dto.RmcOutDto">
+        INSERT INTO rmcOut (rmc_out_st_date, rmc_out_en_date, car_in_date, car_out_date)
+        VALUES (#{rmcOutStDate}, #{rmcOutEnDate}, #{carInDate}, #{carOutDate})
+    </insert>
+
+    <select id="selectAllRmcOut" resultMap="rmcOutMap">
+        SELECT * FROM rmcOut
+    </select>
+
+    <resultMap id="rmcOutMap" type="spring.board.API.dto.RmcOutDto">
+        <result column="rmc_out_st_date" property="rmcOutStDate"></result>
+        <result column="rmc_out_en_date" property="rmcOutEnDate"></result>
+        <result column="car_in_date" property="carInDate"></result>
+        <result column="car_out_date" property="carOutDate"></result>
+    </resultMap>
+</mapper>
