@@ -19,6 +19,7 @@ import spring.board.dto.file.FileRequest;
 import spring.board.dto.file.FileResponse;
 import spring.board.dto.user.UserSession;
 import spring.board.service.file.FTPFileService;
+import spring.board.util.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class BoardService {
 //        HttpSession session = request.getSession();
 //        UserSession userSession = (UserSession) session.getAttribute("USER");
 
-        UserSession userSession = userService.getLoginUserInfo();
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
 
         if (userSession != null) {
             Board board = new Board(null, boardRequest.getTitle(), boardRequest.getContent(), userSession.getIdx(), new Timestamp(new Date().getTime()), null);
@@ -63,7 +64,7 @@ public class BoardService {
             Integer bIdx = boardRequest.getBId();
             if (boardRequest.getFile() != null) {
                 try {
-                    fileService.uploadFiletoFtp(boardRequest, request); // 파일 업로드
+                    fileService.uploadFiletoFtp(boardRequest); // 파일 업로드
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -108,7 +109,7 @@ public class BoardService {
 
     // 내 게시물 - 사용자 검색
     public List<BoardResponse> selectPostsByUserId(int page, int size, int blockSize) {
-        UserSession userSession = userService.getLoginUserInfo();
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
 
         if (userSession != null) {
             Paging paging = new Paging(page, size, blockSize, boardMapper.getTotalCnt());
@@ -125,7 +126,7 @@ public class BoardService {
     }
 
     public CommonResponse updatePost(int bIdx, BoardRequest boardRequest) {
-        UserSession userSession = userService.getLoginUserInfo();
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
 
         if (boardMapper.selectPostByPostId(bIdx) == null) {
             throw new TicketingException(ErrorCode.INVALID_BOARD);
@@ -148,7 +149,7 @@ public class BoardService {
 
     public CommonResponse deletePost(int bIdx) {
 
-        UserSession userSession = userService.getLoginUserInfo();
+        UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
 
         if (boardMapper.selectPostByPostId(bIdx) == null) {
             throw new TicketingException(ErrorCode.INVALID_BOARD);

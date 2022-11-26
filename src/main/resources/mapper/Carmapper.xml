@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.board.dao.MyBatis.CarMapper">
+    <insert id="insertCar" parameterType="spring.board.API.dto.CarDto">
+        INSERT INTO car (car_in_date, car_out_date)
+        VALUES (#{carInDate}, #{carOutDate})
+    </insert>
+
+    <select id="selectAllCar" resultMap="carMap">
+        SELECT * FROM car
+    </select>
+
+    <resultMap id="carMap" type="spring.board.API.dto.CarDto">
+        <result column="car_in_date" property="carInDate"></result>
+        <result column="car_out_date" property="carOutDate"></result>
+    </resultMap>
+</mapper>

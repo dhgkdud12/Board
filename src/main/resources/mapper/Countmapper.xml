@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.board.dao.MyBatis.CntMapper">
+    <insert id="insertCnt" parameterType="spring.board.API.domain.CountList">
+        INSERT INTO count (split_time, normal_count, abnormal_count, car_in_date, car_out_date, rmc_out_st_date, rmc_out_en_date)
+        VALUES (#{splitTime}, #{normalCount}, #{abnormalCount}, #{carInDate}, #{carOutDate}, #{rmcOutStDate}, #{rmcOutEnDate})
+    </insert>
+
+    <select id="selectAllCnt" resultMap="cntMap">
+        SELECT * FROM count
+    </select>
+
+    <resultMap id="cntMap" type="spring.board.API.dto.CountDto">
+        <result column="idx" property="idx"></result>
+        <result column="split_time" property="splitTime"></result>
+        <result column="split_time" property="splitTime"></result>
+        <result column="normal_count" property="normalCount"></result>
+        <result column="abnormal_count" property="abnormalCount"></result>
+        <result column="rmc_out_st_date" property="rmcOutStDate"></result>
+        <result column="rmc_out_en_date" property="rmcOutEnDate"></result>
+        <result column="car_in_date" property="carInDate"></result>
+        <result column="car_out_date" property="carOutDate"></result>
+    </resultMap>
+</mapper>
